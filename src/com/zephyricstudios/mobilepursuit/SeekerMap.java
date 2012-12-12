@@ -32,6 +32,8 @@ import android.view.View.OnClickListener;
 import android.graphics.Typeface;
 import android.widget.TextView;
 
+//This is a fantastic test line!
+
 public class SeekerMap extends MapActivity implements OnClickListener {
 	
 	ArrayList<GeoPoint> geoPoints = new ArrayList<GeoPoint>(); // used to dynamically store geopoints
