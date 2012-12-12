@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Catch Me!</string>
+    <string name="app_display_name">Catch Me!</string>
+    <string name="hello_world">Hello world!</string>
+
+    <!-- Menu -->
+    <string name="menu_settings">Settings</string>
+    <string name="menu_seeker_map">Seeker Map</string>
+    <string name="menu_snitch">Snitch</string>
+    <string name="menu_change_name">Change Name</string>
+
+    <!-- Activity Titles -->
+    <string name="title_activity_main_page">Catch Me If You Can</string>
+    <string name="title_activity_seeker_main_page">SeekerMainPage</string>
+    <string name="title_activity_snitch_main_page">SnitchMainPage</string>
+    <string name="title_activity_confused">Confused</string>
+
+    <!-- Main Page layout -->
+    <string name="i_am">I am&#8230;</string>
+    <string name="seeker">a seeker</string>
+    <string name="snitch">the snitch</string>
+    <string name="confused">confused</string>
+
+    <!-- Misc -->
+    <string name="title_activity_seeker_map">SeekerMap</string>
+    <string name="title_activity_snitch_map">SnitchMap</string>
+    <string name="title_activity_seeker_waiting">SeekerWaitingActivity</string>
+
+    <!-- Snitch Main Page layout -->
+    <string name="wait_for_seeker">Waiting for seekers&#8230;</string>
+    <string name="start">Start</string>
+    <string name="settings">Change Interval (30 Sec)</string>
+    <string name="seeker_name">Empty</string>
+    <string name="sending_texts">Sending Text Messages&#8230;</string>
+
+    <!-- Seeker waiting layout -->
+    <string name="wait_for_snitch">Waiting for snitch&#8230;</string>
+
+    <!-- Accessibility stuff -->
+    <string name="access_seeker">Seeker Icon</string>
+    <string name="access_snitch">Snitch Icon</string>
+    <string name="access_confused">Confused Icon</string>
+    <string name="access_continue">Continue Icon</string>
+    <string name="access_settings">Settings Icon</string>
+    <string name="access_start">Start Icon</string>
+    <string name="access_delete">Delete Icon</string>
+
+    <!-- Seeker Main Page layout -->
+    <string name="snitchs_number">Snitch\'s number</string>
+    <string name="enter_number">Enter number here</string>
+    <string name="pick_contact">Select from contacts</string>
+    <string name="or">or</string>
+    <string name="seeker_continue">Continue</string>
+    
+    <!-- Snitch Map layout -->
+    
+    <string name="game_over">Game Over</string>
+
+    <!-- SeekerMap layout -->
+    <string name="timer">0:23</string>
+    
+    
+    <string name="go_to_seeker_map">Click Me!</string>
+    <string name="title_activity_settings_page">SettingsPage</string>
+    <string name="settings_complete">Save and Return</string>
+    
+    <!-- Game Over layout -->
+    <string name="title_activity_game_over_page">GameOverPage</string>
+    <string name="play_again">Play Again</string>
+    <string name="game">Game</string>
+    <string name="over">Over</string>
+    
+    <!-- Confused layout -->
+    <string name="confused_title">How To Play</string>
+    <string name="confused_objective_title">What is this?</string>
+    <string name="confused_objective_body">Catch Me If You Can is a multiplayer game similar to tag. There is one “snitch,” whom all of the “seekers” are trying to find.</string>
+    <string name="confused_objective_body_2">The seekers get the snitch’s location every 30 seconds (by default, but you can change this in the settings).</string>
+    <string name="confused_start_title">What now?</string>
+    <string name="confused_start_body">First, decide who will be the snitch, and have them select it from the main menu. Then, and only then, have the seekers select “seeker” from the main page, and input the snitch’s number in the appropriate box or select it from their contacts.</string>
+    <string name="confused_game_title">Who am I?</string>
+    <string name="confused_snitch_title">Snitch:</string>
+    <string name="confused_snitch_body">Brave snitch, now is when you run for your life. You may put your phone to sleep and stick it in your fanny pack, if you so desire, but it’s all over when they catch you.</string>
+    <string name="confused_seeker_title">Seeker:</string>
+    <string name="confused_seeker_body">Go get ‘em, tiger! All you have to do is find the snitch! You have a map, and you get their location every 30 or so seconds, so this should be easy… Right?</string>
+    <string name="confused_end_title">Does this end?</string>
+    <string name="confused_game_body">The game ends when the snitch presses the “Game Over” button; you and your friends decide if that happens on sight or on tag. Have fun!</string>
+    
+    <string name="s15s">15 seconds</string>
+    <string name="s30s">30 seconds</string>
+    <string name="s45s">45 seconds</string>
+    <string name="s1m">1 minute</string>
+
+</resources>

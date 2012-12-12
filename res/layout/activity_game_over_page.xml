@@ -1,0 +1,91 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GameOverPage" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="4" >
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="bottom"
+            android:layout_weight="1" >
+
+            <TextView
+                android:id="@+id/text_game"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/game"
+                android:textSize="95sp" />
+
+            <TextView
+                android:id="@+id/text_over"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text_game"
+                android:layout_alignRight="@id/text_game"
+                android:text="@string/over"
+                android:textSize="95sp"
+                android:layout_marginTop="-55dp"
+                android:layout_marginRight="-45dp" />
+
+        </RelativeLayout>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3" />
+        
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight="0.6" >
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/button_play_again"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="70dp"
+            android:layout_weight="5.4"
+            android:clickable="true" >
+
+            <ImageView
+                android:id="@+id/image_play_again"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:contentDescription="@string/access_continue"
+                android:src="@drawable/play_again_icon" />
+
+            <TextView
+                android:id="@+id/text_play_again"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="false"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:layout_toRightOf="@id/image_play_again"
+                android:text="@string/play_again"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</RelativeLayout>
