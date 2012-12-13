@@ -24,7 +24,7 @@
         <uses-library android:name="com.google.android.maps" />
 
         <activity
-            android:name="edu.calpoly.catchmeifyoucan.MainPage"
+            android:name="com.zephyricstudios.mobilepursuit.MainPage"
             android:label="@string/title_activity_main_page"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -34,37 +34,37 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="edu.calpoly.catchmeifyoucan.SeekerMainPage"
+            android:name="com.zephyricstudios.mobilepursuit.SeekerMainPage"
             android:label="@string/title_activity_seeker_main_page"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="edu.calpoly.catchmeifyoucan.SnitchMainPage"
+            android:name="com.zephyricstudios.mobilepursuit.SnitchMainPage"
             android:label="@string/title_activity_snitch_main_page"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="edu.calpoly.catchmeifyoucan.Confused"
+            android:name="com.zephyricstudios.mobilepursuit.Confused"
             android:label="@string/title_activity_confused"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="edu.calpoly.catchmeifyoucan.SeekerMap"
+            android:name="com.zephyricstudios.mobilepursuit.SeekerMap"
             android:label="@string/title_activity_seeker_map"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="edu.calpoly.catchmeifyoucan.SnitchMap"
+            android:name="com.zephyricstudios.mobilepursuit.SnitchMap"
             android:label="@string/title_activity_snitch_map"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="edu.calpoly.catchmeifyoucan.SeekerWaitingPage"
+            android:name="com.zephyricstudios.mobilepursuit.SeekerWaitingPage"
             android:label="@string/title_activity_seeker_waiting"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="edu.calpoly.catchmeifyoucan.GameOverPage"
+            android:name="com.zephyricstudios.mobilepursuit.GameOverPage"
             android:label="@string/title_activity_game_over_page"
             android:screenOrientation="portrait" >
         </activity>

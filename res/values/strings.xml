@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Catch Me!</string>
-    <string name="app_display_name">Catch Me!</string>
+    <string name="app_name">Mobile Pursuit</string>
     <string name="hello_world">Hello world!</string>
 
     <!-- Menu -->
@@ -12,7 +11,7 @@
     <string name="menu_change_name">Change Name</string>
 
     <!-- Activity Titles -->
-    <string name="title_activity_main_page">Catch Me If You Can</string>
+    <string name="title_activity_main_page">Mobile Pursuit</string>
     <string name="title_activity_seeker_main_page">SeekerMainPage</string>
     <string name="title_activity_snitch_main_page">SnitchMainPage</string>
     <string name="title_activity_confused">Confused</string>

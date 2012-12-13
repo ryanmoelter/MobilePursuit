@@ -2,7 +2,6 @@ package com.zephyricstudios.mobilepursuit;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,8 +15,6 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-//Typeface
-import android.widget.Toast;
 
 
 public class MainPage extends Activity implements OnClickListener{
