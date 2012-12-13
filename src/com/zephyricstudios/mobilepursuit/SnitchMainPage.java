@@ -32,7 +32,8 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 	
 	SmsManager sm = SmsManager.getDefault();
 	
-	TextView title, startText, seekerName1, seekerName2, seekerName3, seekerName4, seekerName5, textSnitchSettings;
+	TextView title, startText, seekerName1, seekerName2, seekerName3, seekerName4, 
+		seekerName5, textSnitchSettings, textSending;
 	
 	Boolean seekerEntered1, seekerEntered2, seekerEntered3, seekerEntered4, seekerEntered5;
 	Boolean intervalSettingsVisible;
@@ -69,6 +70,8 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         title.setTypeface(light);
         startText = (TextView)findViewById(R.id.text_snitch_start);
         startText.setTypeface(light);
+        textSending = (TextView)findViewById(R.id.text_sending);
+        textSending.setTypeface(light);
         
         //seeker name textviews
         seekerName1 = (TextView)findViewById(R.id.seeker_name_1);
@@ -122,7 +125,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         
         textSnitchSettings = (TextView)findViewById(R.id.text_snitch_settings);
         
-        sendingLayout = (RelativeLayout)findViewById(R.id.text_sending);
+        sendingLayout = (RelativeLayout)findViewById(R.id.loading_layout);
         
         timerInterval = 30;
         
