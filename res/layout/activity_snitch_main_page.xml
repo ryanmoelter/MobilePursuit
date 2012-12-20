@@ -10,7 +10,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="10dp"
-        android:fontFamily="roboto"
+        
         android:text="@string/wait_for_seeker"
         android:textAppearance="?android:attr/textAppearanceLarge"
         tools:context=".SnitchMainPage" />
@@ -61,7 +61,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="20dp"
                 android:layout_toRightOf="@id/image_snitch_start"
-                android:fontFamily="roboto"
+                
                 android:text="@string/start"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
         </RelativeLayout>
@@ -100,7 +100,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="10dp"
                 android:layout_toLeftOf="@id/image_snitch_settings"
-                android:fontFamily="roboto"
+                
                 android:text="@string/settings"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
         </RelativeLayout>
@@ -156,7 +156,7 @@
                             android:id="@+id/seeker_name_1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="roboto"
+                            
                             android:text="@string/seeker_name"
                             android:textAppearance="?android:attr/textAppearanceLarge" />
                     </LinearLayout>
@@ -216,7 +216,7 @@
                             android:id="@+id/seeker_name_2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="roboto"
+                            
                             android:text="@string/seeker_name"
                             android:textAppearance="?android:attr/textAppearanceLarge" />
                     </LinearLayout>
@@ -276,7 +276,7 @@
                             android:id="@+id/seeker_name_3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="roboto"
+                            
                             android:text="@string/seeker_name"
                             android:textAppearance="?android:attr/textAppearanceLarge" />
                     </LinearLayout>
@@ -336,7 +336,6 @@
                             android:id="@+id/seeker_name_4"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="roboto"
                             android:text="@string/seeker_name"
                             android:textAppearance="?android:attr/textAppearanceLarge" />
                     </LinearLayout>
@@ -396,7 +395,7 @@
                             android:id="@+id/seeker_name_5"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="roboto"
+                            
                             android:text="@string/seeker_name"
                             android:textAppearance="?android:attr/textAppearanceLarge" />
                     </LinearLayout>
@@ -451,14 +450,14 @@
             android:orientation="vertical"
             android:background="@color/white"
             android:padding="20dp"
-            android:clickable="true" >"
+            android:clickable="true" >
             
             <Button
                 android:id="@+id/button_15s"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/accent"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="17dp"
                 android:text="@string/s15s"
                 android:gravity="center_horizontal"
                 android:textAppearance="?android:attr/textAppearanceLargeInverse"
@@ -469,7 +468,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/accent"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="17dp"
                 android:text="@string/s30s"
                 android:gravity="center_horizontal"
                 android:textAppearance="?android:attr/textAppearanceLargeInverse"
@@ -480,7 +479,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/accent"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="17dp"
                 android:text="@string/s45s"
                 android:gravity="center_horizontal"
                 android:textAppearance="?android:attr/textAppearanceLargeInverse"

@@ -38,9 +38,9 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 	Boolean seekerEntered1, seekerEntered2, seekerEntered3, seekerEntered4, seekerEntered5;
 	Boolean intervalSettingsVisible;
 	
-	RelativeLayout seeker1, seeker2, seeker3, seeker4, seeker5;
-	RelativeLayout deleteSeeker1, deleteSeeker2, deleteSeeker3, deleteSeeker4, deleteSeeker5;
-	RelativeLayout snitchSettingsButton, sendingLayout;
+	RelativeLayout seeker1, seeker2, seeker3, seeker4, seeker5,
+		deleteSeeker1, deleteSeeker2, deleteSeeker3, deleteSeeker4, deleteSeeker5,
+		snitchSettingsButton, sendingLayout;
 	LinearLayout intervalSettings;
 	Button btnInterval15s, btnInterval30s, btnInterval45s, btnInterval60s;
 	
@@ -116,6 +116,10 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         btnInterval30s.setOnClickListener(this);
         btnInterval45s.setOnClickListener(this);
         btnInterval60s.setOnClickListener(this);
+        btnInterval15s.setTypeface(light);
+        btnInterval30s.setTypeface(light);
+        btnInterval45s.setTypeface(light);
+        btnInterval60s.setTypeface(light);
         
         deleteSeeker1.setOnClickListener(this);
         deleteSeeker2.setOnClickListener(this);
