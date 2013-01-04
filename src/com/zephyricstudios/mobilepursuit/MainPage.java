@@ -159,6 +159,7 @@ public class MainPage extends Activity implements OnClickListener{
 		} */
 		
 		if(buttonChosen==buttonMainSnitch){
+			//buttonChosen.setBackgroundColor(getResources().getColor(R.color.accent));
 			i = new Intent(this, SnitchMainPage.class);
 			//CmiycJavaRes.activityState = CmiycJavaRes.SNITCHMAIN;
 		}else if(buttonChosen==buttonMainSeeker){
