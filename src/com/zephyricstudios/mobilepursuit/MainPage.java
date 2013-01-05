@@ -17,7 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
-public class MainPage extends Activity implements OnClickListener{
+public class MainPage extends Activity implements OnClickListener {
 	
 	RelativeLayout buttonMainSnitch;
 	RelativeLayout buttonMainSeeker;
@@ -61,7 +61,7 @@ public class MainPage extends Activity implements OnClickListener{
     		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
     		alert.setTitle("Enter User Name");
-    		alert.setMessage("Please enter your name.");
+    		alert.setMessage("Please enter your name. You can change this at any time by pressing the menu button.");
 
     		// Set an EditText view to get user input 
     		final EditText input = new EditText(this);
@@ -86,10 +86,7 @@ public class MainPage extends Activity implements OnClickListener{
     		alert.show();
     	}
     	
-    	
-    	
     	sp.getString("username", CmiycJavaRes.SHARED_PREFS_DEFAULT);
-    	
     	
     }
     

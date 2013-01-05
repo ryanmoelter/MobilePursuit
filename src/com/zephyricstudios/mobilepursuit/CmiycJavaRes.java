@@ -1,6 +1,8 @@
 package com.zephyricstudios.mobilepursuit;
 
 import com.google.android.maps.GeoPoint;
+import java.util.ArrayList;
+import com.zephyricstudios.mobilepursuit.Seeker;
 
 public class CmiycJavaRes {
 	
@@ -23,6 +25,8 @@ public class CmiycJavaRes {
 	static final String USERNAME_KEY = "username";
 	
 	static int activityState;
+	
+	static ArrayList<Seeker> seekers = new ArrayList<Seeker>();
 	
 	public static GeoPoint stringToGeoPoint(String geoString){
 		String testString = geoString.replace("-", "").replace(",", "");

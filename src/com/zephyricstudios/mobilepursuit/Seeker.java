@@ -2,38 +2,31 @@ package com.zephyricstudios.mobilepursuit;
 
 import java.util.ArrayList;
 
-import android.content.Context;
-import android.widget.RelativeLayout;
-
-
-
 public class Seeker {
-	
-	static ArrayList<Seeker> seekerArray = new ArrayList<Seeker>();
 	
 	String mName;
 	String mNumber;
-	boolean mEntered;
 	
 	public Seeker(String number, String name) {
 		mName = name;
 		mNumber = number;
-		mEntered = true;
 	}
 	
-	public void deleteSeeker() {
-		mEntered = false;
+	public void deleteSeeker(ArrayList<Seeker> seekerArray, int index) {
+		seekerArray.remove(index);
 	}
 	
-	public void createSeekerLayout(Context context) {
-		RelativeLayout seekerLayout = new RelativeLayout(context);
-		
-	}
-	
-	public static void createSeeker(String number, String name, Context context) {
+	public static void createSeeker(ArrayList<Seeker> seekerArray, String number, String name) {
 		seekerArray.add(new Seeker(number, name));
-		seekerArray.get(seekerArray.size() - 1).createSeekerLayout(context);
 		
+	}
+	
+	public String getName() {
+		return mName;
+	}
+	
+	public String getNumber() {
+		return mNumber;
 	}
 
 }
