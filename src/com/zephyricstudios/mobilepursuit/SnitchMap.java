@@ -40,7 +40,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	Drawable drawable;
 	TextView snitchTimer;
 	SmsManager sm = SmsManager.getDefault();
-	ArrayList<String> seekerNumbers;
+	ArrayList<Seeker> seekerArray;
 	Timer timer;
 	int timerInterval;
 	int secondCounter;
@@ -59,7 +59,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 		mapOverlays = mapView.getOverlays();
         mapOverlays.add(myLocationOverlay);
         snitchTimer = (TextView)findViewById(R.id.snitch_timer);
-        seekerNumbers = this.getIntent().getExtras().getStringArrayList(CmiycJavaRes.SEEKER_NUMBERS_KEY);
+        seekerArray = this.getIntent().getExtras().getParcelableArrayList(CmiycJavaRes.SEEKER_ARRAY_KEY);
         secondCounter = 0;
         timerInterval = this.getIntent().getExtras().getInt(CmiycJavaRes.TIMER_INTERVAL_KEY);
         timer = new Timer();
@@ -129,9 +129,9 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	                return;
 	            }}); 
 	              alertDialog.show();*/
-			for(int j =0;j<seekerNumbers.size();j++){
+			for(int j =0;j<seekerArray.size();j++){
 				String textContent = "@!#gameOver";
-				sm.sendTextMessage(seekerNumbers.get(j), null, textContent, null, null);
+				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, textContent, null, null);
 			}
 			myLocationOverlay.disableMyLocation();
 			timer.cancel();
@@ -156,9 +156,9 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	            alertDialog.setMessage("Do you really want to go back? This will remove you from the game!");
 	            alertDialog.setButton("Yes", new DialogInterface.OnClickListener() {
 	              public void onClick(DialogInterface dialog, int which) {
-	            	  for(int j =0;j<seekerNumbers.size();j++){
+	            	  for(int j =0;j<seekerArray.size();j++){
 	      				String textContent = "@!#gameOver";
-	      				sm.sendTextMessage(seekerNumbers.get(j), null, textContent, null, null);
+	      				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, textContent, null, null);
 	            	  }
 	            	  myLocationOverlay.disableMyLocation();
 	            	  timer.cancel();
@@ -186,10 +186,10 @@ public class SnitchMap extends MapActivity implements OnClickListener {
                 public void run() {
                 	if(secondCounter>=timerInterval){
                 		//put in texting
-                		if(seekerNumbers!=null){
-                			for(int j =0;j<seekerNumbers.size();j++){
+                		if(seekerArray!=null){
+                			for(int j =0;j<seekerArray.size();j++){
                 				String textContent = "@!#gp:" + myLocationOverlay.getMyLocation().toString();
-                				sm.sendTextMessage(seekerNumbers.get(j), null, textContent, null, null);
+                				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, textContent, null, null);
                 			}
                 		}
                 		

@@ -110,8 +110,16 @@
             android:layout_height="match_parent"
             android:layout_weight="0.6" />
     </LinearLayout>
+    
+    <ListView
+        android:id="@+id/seeker_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/start_button_layout"
+        android:layout_below="@id/title_line"
+        android:layout_marginBottom="20dp" />
 
-    <ScrollView
+    <!-- <ScrollView
         android:id="@+id/Scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -425,7 +433,7 @@
                 </RelativeLayout>
             </RelativeLayout>
         </LinearLayout>
-    </ScrollView>
+    </ScrollView> -->
     
     <LinearLayout
         android:id="@+id/interval_settings_layout"

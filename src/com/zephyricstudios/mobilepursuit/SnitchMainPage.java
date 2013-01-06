@@ -1,7 +1,6 @@
 package com.zephyricstudios.mobilepursuit;
 
 import java.util.ArrayList;
-
 import android.os.Bundle;
 import android.app.Activity;
 import android.telephony.SmsManager;
@@ -20,6 +19,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.graphics.Typeface;
+import android.widget.ListView;
+import com.zephyricstudios.mobilepursuit.SeekerAdapter;
 
 public class SnitchMainPage extends Activity implements OnClickListener{
 	
@@ -32,26 +33,21 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 	
 	SmsManager sm = SmsManager.getDefault();
 	
-	TextView title, startText, seekerName1, seekerName2, seekerName3, seekerName4, 
-		seekerName5, textSnitchSettings, textSending;
+	//Seeker Object Stuff
+	ListView seekerList;
+	ArrayList<Seeker> seekerArray;
+	SeekerAdapter adapter;
 	
-	Boolean seekerEntered1, seekerEntered2, seekerEntered3, seekerEntered4, seekerEntered5;
+	TextView title, startText, textSnitchSettings, textSending;
+	
 	Boolean intervalSettingsVisible;
 	
-	RelativeLayout seeker1, seeker2, seeker3, seeker4, seeker5,
-		deleteSeeker1, deleteSeeker2, deleteSeeker3, deleteSeeker4, deleteSeeker5,
-		snitchSettingsButton, sendingLayout;
+	RelativeLayout snitchSettingsButton, sendingLayout;
 	LinearLayout intervalSettings;
 	Button btnInterval15s, btnInterval30s, btnInterval45s, btnInterval60s;
 	
-	ArrayList<String> seekerNumbers;
-	ArrayList<String> seekerNames;
-	
 	BroadcastReceiver localTextReceiver;
 	IntentFilter filter;
-	
-	String seekerNumber1, seekerNumber2, seekerNumber3, seekerNumber4, seekerNumber5;
-	String name1, name2, name3, name4, name5;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,6 +60,14 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         settings = (RelativeLayout)findViewById(R.id.snitch_settings_button);
         settings.setOnClickListener(this);
         
+        //Seeker Object Stuff
+        seekerArray = new ArrayList<Seeker>();
+        
+        adapter = new SeekerAdapter(this, R.layout.list_item, seekerArray, this, light);
+        
+        seekerList = (ListView)findViewById(R.id.seeker_list);
+        seekerList.setAdapter(adapter);
+        
         // Typeface
         light = Typeface.createFromAsset(getAssets(), "roboto_light.ttf");
         title = (TextView)findViewById(R.id.text_snitch_title);
@@ -72,35 +76,6 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         startText.setTypeface(light);
         textSending = (TextView)findViewById(R.id.text_sending);
         textSending.setTypeface(light);
-        
-        //seeker name textviews
-        seekerName1 = (TextView)findViewById(R.id.seeker_name_1);
-        seekerName1.setTypeface(light);
-        seekerName2 = (TextView)findViewById(R.id.seeker_name_2);
-        seekerName2.setTypeface(light);
-        seekerName3 = (TextView)findViewById(R.id.seeker_name_3);
-        seekerName3.setTypeface(light);
-        seekerName4 = (TextView)findViewById(R.id.seeker_name_4);
-        seekerName4.setTypeface(light);
-        seekerName5 = (TextView)findViewById(R.id.seeker_name_5);
-        seekerName5.setTypeface(light);
-        
-        //seeker name relative layout (to be made visible/invisible appropriately
-        seeker1 = (RelativeLayout)findViewById(R.id.seeker_1);
-        seeker2 = (RelativeLayout)findViewById(R.id.seeker_2);
-        seeker3 = (RelativeLayout)findViewById(R.id.seeker_3);
-        seeker4 = (RelativeLayout)findViewById(R.id.seeker_4);
-        seeker5 = (RelativeLayout)findViewById(R.id.seeker_5);
-        deleteSeeker1 = (RelativeLayout)findViewById(R.id.delete_1);
-        deleteSeeker2 = (RelativeLayout)findViewById(R.id.delete_2);
-        deleteSeeker3 = (RelativeLayout)findViewById(R.id.delete_3);
-        deleteSeeker4 = (RelativeLayout)findViewById(R.id.delete_4);
-        deleteSeeker5 = (RelativeLayout)findViewById(R.id.delete_5);
-        seekerEntered1 = false;
-        seekerEntered2 = false;
-        seekerEntered3 = false;
-        seekerEntered4 = false;
-        seekerEntered5 = false;
         
         snitchSettingsButton = (RelativeLayout)findViewById(R.id.snitch_settings_button);
         snitchSettingsButton.setOnClickListener(this);
@@ -121,20 +96,12 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         btnInterval45s.setTypeface(light);
         btnInterval60s.setTypeface(light);
         
-        deleteSeeker1.setOnClickListener(this);
-        deleteSeeker2.setOnClickListener(this);
-        deleteSeeker3.setOnClickListener(this);
-        deleteSeeker4.setOnClickListener(this);
-        deleteSeeker5.setOnClickListener(this);
-        
         textSnitchSettings = (TextView)findViewById(R.id.text_snitch_settings);
         
         sendingLayout = (RelativeLayout)findViewById(R.id.loading_layout);
         
         timerInterval = 30;
         
-        seekerNumbers = new ArrayList<String>();
-        seekerNames = new ArrayList<String>();
         CmiycJavaRes.activityState = CmiycJavaRes.SNITCHMAIN;
         
         localTextReceiver = new BroadcastReceiver(){
@@ -155,7 +122,12 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 
 				        for (SmsMessage currentMessage : messages) {
 				        	if(currentMessage.getDisplayMessageBody().contains("@!#seekerJoin;seekerName:")){ 
-				        		if(!seekerEntered1){
+				        		Seeker.createSeeker(currentMessage.getDisplayOriginatingAddress(),
+				        				currentMessage.getDisplayMessageBody().replace("@!#seekerJoin;seekerName:", ""),
+				        				seekerArray, adapter);
+				        		this.abortBroadcast();
+				        		
+				        		/*if(!seekerEntered1){
 				        			seeker1.setVisibility(View.VISIBLE);
 				        			name1 = currentMessage.getDisplayMessageBody().replace("@!#seekerJoin;seekerName:", "");
 				        			seekerName1.setText(name1);
@@ -190,7 +162,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 				        			seekerNumber5 = currentMessage.getDisplayOriginatingAddress();
 				       				seekerEntered5 = true;
 				       				this.abortBroadcast();
-				       			}
+				       			} */
 				       		} 
 				        		//currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
 				        		//currentMessage.getDisplayMessageBody();				// has the actual message
@@ -227,13 +199,17 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     public void onClick(View v){
     	Intent i;
     	if(v.equals(findViewById(R.id.snitch_start_button))) {
-    		if(seekerEntered1 || seekerEntered2 || seekerEntered3 || seekerEntered4 || seekerEntered5){
+    		if(!seekerArray.isEmpty()
+    				/*seekerEntered1 || seekerEntered2 || seekerEntered3 || seekerEntered4 || seekerEntered5*/){
     			i = new Intent(this, SnitchMap.class);
     			String textContent = "@!#seekerConfirm;int:" + timerInterval;
     			
     			sendingLayout.setVisibility(View.VISIBLE);
     			
-    			if(seekerEntered1){
+    			for(int index = 0; seekerArray.size() < index; index++) {
+    				sm.sendTextMessage(seekerArray.get(index).getNumber(), null, textContent, null, null);
+    			}
+    			/*if(seekerEntered1){
     				sm.sendTextMessage(seekerNumber1, null, textContent, null, null);
     				seekerNumbers.add(seekerNumber1);
     				seekerNames.add(name1);
@@ -257,10 +233,11 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     				sm.sendTextMessage(seekerNumber5, null, textContent, null, null);
     				seekerNumbers.add(seekerNumber5);
     				seekerNames.add(name5);
-    			}
-    			CmiycJavaRes.activityState = CmiycJavaRes.SNITCHMAP;
-    			i.putStringArrayListExtra(CmiycJavaRes.SEEKER_NUMBERS_KEY, seekerNumbers);
-    			i.putStringArrayListExtra(CmiycJavaRes.SEEKER_NAMES_KEY, seekerNames);
+    			}*/
+    			//CmiycJavaRes.activityState = CmiycJavaRes.SNITCHMAP;
+    			//i.putStringArrayListExtra(CmiycJavaRes.SEEKER_NUMBERS_KEY, seekerNumbers);
+    			//i.putStringArrayListExtra(CmiycJavaRes.SEEKER_NAMES_KEY, seekerNames);
+    			i.putParcelableArrayListExtra(CmiycJavaRes.SEEKER_ARRAY_KEY, seekerArray);
     			i.putExtra(CmiycJavaRes.TIMER_INTERVAL_KEY, timerInterval);
     			this.startActivity(i);
     			finish();
@@ -272,7 +249,12 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     			Toast toast = Toast.makeText(context, text, duration);
     			toast.show();
     		}
-    	} else if(v.equals(deleteSeeker1)){
+    	} else if(v.getId() == R.id.item_delete) {
+    		int position = (int)Integer.valueOf((String)v.getTag());
+    		Seeker.deleteSeeker(position, seekerArray, adapter);
+    	}
+    	
+    	/*else if(v.equals(deleteSeeker1)){
 			seekerName1.setText("Waiting...");
 			seekerEntered1 = false;
 			seeker1.setVisibility(View.GONE);
@@ -292,7 +274,9 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     		seekerName5.setText("Waiting...");
     		seekerEntered5 = false;
 			seeker5.setVisibility(View.GONE);
-    	} else if(v.equals(snitchSettingsButton)){
+    	} */ 
+    	
+    	else if(v.equals(snitchSettingsButton)){
     		intervalSettings.setVisibility(View.VISIBLE);
     		intervalSettingsVisible = true;
     	} else if(v.equals(btnInterval15s)){

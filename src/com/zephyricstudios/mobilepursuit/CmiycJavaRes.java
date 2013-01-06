@@ -16,6 +16,7 @@ public class CmiycJavaRes {
 	
 	static final int SETTINGS_PAGE_RESULT_CODE = 2045;
 	
+	static final String SEEKER_ARRAY_KEY = "seeker array";
 	static final String SEEKER_NUMBERS_KEY = "seeker numbers";
 	static final String SEEKER_NAMES_KEY = "seeker names";
 	static final String TIMER_INTERVAL_KEY = "interval";
