@@ -63,11 +63,6 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         //Seeker Object Stuff
         seekerArray = new ArrayList<Seeker>();
         
-        adapter = new SeekerAdapter(this, R.layout.list_item, seekerArray, this, light);
-        
-        seekerList = (ListView)findViewById(R.id.seeker_list);
-        seekerList.setAdapter(adapter);
-        
         // Typeface
         light = Typeface.createFromAsset(getAssets(), "roboto_light.ttf");
         title = (TextView)findViewById(R.id.text_snitch_title);
@@ -76,6 +71,11 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         startText.setTypeface(light);
         textSending = (TextView)findViewById(R.id.text_sending);
         textSending.setTypeface(light);
+        
+        adapter = new SeekerAdapter(this, R.layout.list_item, seekerArray, this, light);
+        
+        seekerList = (ListView)findViewById(R.id.seeker_list);
+        seekerList.setAdapter(adapter);
         
         snitchSettingsButton = (RelativeLayout)findViewById(R.id.snitch_settings_button);
         snitchSettingsButton.setOnClickListener(this);
@@ -303,17 +303,17 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     }
     
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-	     if (keyCode == KeyEvent.KEYCODE_BACK) {
+    	if (keyCode == KeyEvent.KEYCODE_BACK) {
 
-	         if(intervalSettingsVisible){
-	        	 intervalSettings.setVisibility(View.GONE);
-	             intervalSettingsVisible = false;
-	         } else{
+    		if(intervalSettingsVisible){
+    			intervalSettings.setVisibility(View.GONE);
+	            intervalSettingsVisible = false;
+	        } else{
 	        	finish();
-	         }
+	        }
 
-	         return true;
+	        return true;
 	     }
 	     return super.onKeyDown(keyCode, event);
-	 }
+	}
 }
