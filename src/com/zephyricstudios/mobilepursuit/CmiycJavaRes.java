@@ -27,8 +27,6 @@ public class CmiycJavaRes {
 	
 	static int activityState;
 	
-	static ArrayList<Seeker> seekers = new ArrayList<Seeker>();
-	
 	public static GeoPoint stringToGeoPoint(String geoString){
 		String testString = geoString.replace("-", "").replace(",", "");
 		int latitudeInt;

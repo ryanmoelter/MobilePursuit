@@ -14,12 +14,14 @@ import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.telephony.SmsMessage;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -74,6 +76,8 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         light = Typeface.createFromAsset(getAssets(), "roboto_light.ttf");
         textTagged = (TextView)findViewById(R.id.text_snitch_tagged);
         textTagged.setTypeface(light);
+        
+        
         
 	}
 
@@ -154,7 +158,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	            alertDialog.setIcon(R.drawable.ic_launcher);
 
 	            alertDialog.setMessage("Do you really want to go back? This will remove you from the game!");
-	            alertDialog.setButton("Yes", new DialogInterface.OnClickListener() {
+	            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
 	              public void onClick(DialogInterface dialog, int which) {
 	            	  for(int j =0;j<seekerArray.size();j++){
 	      				String textContent = "@!#gameOver";
@@ -165,7 +169,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	                  finish();
 	                return;
 	            } }); 
-	            alertDialog.setButton2("No", new DialogInterface.OnClickListener() {
+	            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
 	              public void onClick(DialogInterface dialog, int which) {
 	                  dialog.cancel();
 	                return;
@@ -184,10 +188,10 @@ public class SnitchMap extends MapActivity implements OnClickListener {
             SnitchMap.this.runOnUiThread(new Runnable() {
 
                 public void run() {
-                	if(secondCounter>=timerInterval){
+                	if(secondCounter >= timerInterval){
                 		//put in texting
-                		if(seekerArray!=null){
-                			for(int j =0;j<seekerArray.size();j++){
+                		if(seekerArray != null){
+                			for(int j = 0 ; j < seekerArray.size(); j++){
                 				String textContent = "@!#gp:" + myLocationOverlay.getMyLocation().toString();
                 				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, textContent, null, null);
                 			}

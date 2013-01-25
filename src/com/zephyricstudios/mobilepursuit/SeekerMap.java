@@ -100,6 +100,9 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 				        		String geoStringTemp = currentMessage.getDisplayMessageBody().replace("@!#gp:", "");
 				        		GeoPoint geoPointTemp = CmiycJavaRes.stringToGeoPoint(geoStringTemp); 	//add textview to display								
 				        		addMarker(geoPointTemp); 												
+				        		
+				        		resetCounter(); //Reset the timer
+				        		
 				        		this.abortBroadcast();
 				        	}  else if(currentMessage.getDisplayMessageBody().contains("@!#gameOver")){
 			        			Intent i = new Intent(context, GameOverPage.class);
@@ -152,7 +155,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	}
 
 	public void onClick(View v) {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub
 		
 	}
 	
@@ -164,12 +167,12 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	            alertDialog.setIcon(R.drawable.ic_launcher);
 
 	            alertDialog.setMessage("Do you really want to go back? This will remove you from the game!");
-	            alertDialog.setButton("Yes", new DialogInterface.OnClickListener() {
+	            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
 	              public void onClick(DialogInterface dialog, int which) {
 	                  finish();
 	                return;
 	            } }); 
-	            alertDialog.setButton2("No", new DialogInterface.OnClickListener() {
+	            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
 	              public void onClick(DialogInterface dialog, int which) {
 	                  dialog.cancel();
 	                return;
@@ -207,6 +210,10 @@ public class SeekerMap extends MapActivity implements OnClickListener {
                 }
             });
         }
-   }
+    }
+	
+	public void resetCounter() {
+		secondCounter = 0;
+	}
 }
 

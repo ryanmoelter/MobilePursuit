@@ -199,41 +199,16 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     public void onClick(View v){
     	Intent i;
     	if(v.equals(findViewById(R.id.snitch_start_button))) {
-    		if(!seekerArray.isEmpty()
-    				/*seekerEntered1 || seekerEntered2 || seekerEntered3 || seekerEntered4 || seekerEntered5*/){
+    		if(!seekerArray.isEmpty()){
     			i = new Intent(this, SnitchMap.class);
     			String textContent = "@!#seekerConfirm;int:" + timerInterval;
     			
     			sendingLayout.setVisibility(View.VISIBLE);
     			
-    			for(int index = 0; seekerArray.size() < index; index++) {
+    			for(int index = 0; seekerArray.size() > index; index++) {
     				sm.sendTextMessage(seekerArray.get(index).getNumber(), null, textContent, null, null);
     			}
-    			/*if(seekerEntered1){
-    				sm.sendTextMessage(seekerNumber1, null, textContent, null, null);
-    				seekerNumbers.add(seekerNumber1);
-    				seekerNames.add(name1);
-    			}
-    			if(seekerEntered2){
-    				sm.sendTextMessage(seekerNumber2, null, textContent, null, null);
-    				seekerNumbers.add(seekerNumber2);
-    				seekerNames.add(name2);
-    			}
-    			if(seekerEntered3){
-    				sm.sendTextMessage(seekerNumber3, null, textContent, null, null);
-    				seekerNumbers.add(seekerNumber3);
-    				seekerNames.add(name3);
-    			}
-    			if(seekerEntered4){
-    				sm.sendTextMessage(seekerNumber4, null, textContent, null, null);
-    				seekerNumbers.add(seekerNumber4);
-    				seekerNames.add(name4);
-    			}
-    			if(seekerEntered5){
-    				sm.sendTextMessage(seekerNumber5, null, textContent, null, null);
-    				seekerNumbers.add(seekerNumber5);
-    				seekerNames.add(name5);
-    			}*/
+    			
     			//CmiycJavaRes.activityState = CmiycJavaRes.SNITCHMAP;
     			//i.putStringArrayListExtra(CmiycJavaRes.SEEKER_NUMBERS_KEY, seekerNumbers);
     			//i.putStringArrayListExtra(CmiycJavaRes.SEEKER_NAMES_KEY, seekerNames);
@@ -241,7 +216,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     			i.putExtra(CmiycJavaRes.TIMER_INTERVAL_KEY, timerInterval);
     			this.startActivity(i);
     			finish();
-    		} else{
+    		} else {
     			Context context = getApplicationContext();
     			CharSequence text = "At least one seeker is required to continue";
     			int duration = Toast.LENGTH_SHORT;
@@ -249,32 +224,12 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     			Toast toast = Toast.makeText(context, text, duration);
     			toast.show();
     		}
-    	} else if(v.getId() == R.id.item_delete) {
+    	}
+    	
+    	else if(v.getId() == R.id.item_delete) {
     		int position = (int)Integer.valueOf((String)v.getTag());
     		Seeker.deleteSeeker(position, seekerArray, adapter);
     	}
-    	
-    	/*else if(v.equals(deleteSeeker1)){
-			seekerName1.setText("Waiting...");
-			seekerEntered1 = false;
-			seeker1.setVisibility(View.GONE);
-    	} else if(v.equals(deleteSeeker2)){
-    		seekerName2.setText("Waiting...");
-			seekerEntered2 = false;
-			seeker2.setVisibility(View.GONE);
-    	} else if(v.equals(deleteSeeker3)){
-    		seekerName3.setText("Waiting...");
-			seekerEntered3 = false;
-			seeker3.setVisibility(View.GONE);
-    	} else if(v.equals(deleteSeeker4)){
-    		seekerName4.setText("Waiting...");
-			seekerEntered4 = false;
-			seeker4.setVisibility(View.GONE);
-    	} else if(v.equals(deleteSeeker1)){
-    		seekerName5.setText("Waiting...");
-    		seekerEntered5 = false;
-			seeker5.setVisibility(View.GONE);
-    	} */ 
     	
     	else if(v.equals(snitchSettingsButton)){
     		intervalSettings.setVisibility(View.VISIBLE);

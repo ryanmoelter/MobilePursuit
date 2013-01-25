@@ -32,6 +32,15 @@ public class Seeker implements Parcelable {
 		return mNumber;
 	}
 	
+	public static void deleteSeekerByNum(String number, ArrayList<Seeker> array) {
+		for(int i = 0; i < array.size(); i++) {
+			if(array.get(i).getNumber().equals(number) ) {
+				array.remove(i);
+				return;
+			}
+		}
+	}
+	
 	/* everything below here is for implementing Parcelable */
 
     // 99.9% of the time you can just ignore this
