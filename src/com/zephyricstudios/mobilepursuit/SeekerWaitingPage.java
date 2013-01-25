@@ -109,5 +109,11 @@ public class SeekerWaitingPage extends Activity {
     	Ref.activityState = Ref.SEEKERWAITING;
     	
     }
+	
+	@Override
+	public void onStop() {
+		super.onStop();
+		this.unregisterReceiver(this.localTextReceiver);
+	}
 
 }
