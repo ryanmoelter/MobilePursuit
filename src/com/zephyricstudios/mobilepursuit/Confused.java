@@ -45,7 +45,7 @@ public class Confused extends Activity {
     @Override
     public void onResume(){
     	super.onResume();
-    	CmiycJavaRes.activityState = CmiycJavaRes.CONFUSED;
+    	Ref.activityState = Ref.CONFUSED;
     	
     }
 }

@@ -51,6 +51,8 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	// Typeface
 	Typeface thin, light;
 	TextView textTagged;
+	
+	BroadcastReceiver localTextReceiver;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,12 +63,12 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 		mapOverlays = mapView.getOverlays();
         mapOverlays.add(myLocationOverlay);
         snitchTimer = (TextView)findViewById(R.id.snitch_timer);
-        seekerArray = this.getIntent().getExtras().getParcelableArrayList(CmiycJavaRes.SEEKER_ARRAY_KEY);
+        seekerArray = this.getIntent().getExtras().getParcelableArrayList(Ref.SEEKER_ARRAY_KEY);
         secondCounter = 0;
-        timerInterval = this.getIntent().getExtras().getInt(CmiycJavaRes.TIMER_INTERVAL_KEY);
+        timerInterval = this.getIntent().getExtras().getInt(Ref.TIMER_INTERVAL_KEY);
         timer = new Timer();
         timer.schedule(new SnitchTimerTask(), 0, 1000);
-        CmiycJavaRes.activityState = CmiycJavaRes.SNITCHMAP;
+        Ref.activityState = Ref.SNITCHMAP;
         buttonSnitchTagged = (RelativeLayout)findViewById(R.id.button_snitch_tagged);
         buttonSnitchTagged.setOnClickListener(this);
         
@@ -77,7 +79,35 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         textTagged = (TextView)findViewById(R.id.text_snitch_tagged);
         textTagged.setTypeface(light);
         
-        
+        localTextReceiver = new BroadcastReceiver(){
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				Bundle bundle = intent.getExtras();
+
+				if (bundle != null) {
+				        Object[] pdusObj = (Object[]) bundle.get("pdus");
+				        SmsMessage[] messages = new SmsMessage[pdusObj.length];
+				        
+				        // getting SMS information from Pdu.
+				        for (int i = 0; i < pdusObj.length; i++) {
+				                messages[i] = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
+				        }
+
+				        for (SmsMessage currentMessage : messages) {
+				        	if(currentMessage.getDisplayMessageBody().contains(Ref.IM_OUT)){
+				        		Seeker.deleteSeekerByNum(currentMessage.getDisplayOriginatingAddress(), seekerArray);
+				        		
+				        		this.abortBroadcast();
+				        	}
+				               //currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
+				               //currentMessage.getDisplayMessageBody();				// has the actual message
+				        }
+				}
+				
+			}
+        	
+        };
         
 	}
 
@@ -106,7 +136,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 		super.onResume();
 		// when our activity resumes, we want to register for location updates
     	myLocationOverlay.enableMyLocation();
-    	CmiycJavaRes.activityState = CmiycJavaRes.SNITCHMAP;
+    	Ref.activityState = Ref.SNITCHMAP;
 	}
 
 	@Override
@@ -134,8 +164,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	            }}); 
 	              alertDialog.show();*/
 			for(int j =0;j<seekerArray.size();j++){
-				String textContent = "@!#gameOver";
-				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, textContent, null, null);
+				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, Ref.GAME_OVER, null, null);
 			}
 			myLocationOverlay.disableMyLocation();
 			timer.cancel();
@@ -161,8 +190,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
 	              public void onClick(DialogInterface dialog, int which) {
 	            	  for(int j =0;j<seekerArray.size();j++){
-	      				String textContent = "@!#gameOver";
-	      				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, textContent, null, null);
+	      				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, Ref.GAME_OVER, null, null);
 	            	  }
 	            	  myLocationOverlay.disableMyLocation();
 	            	  timer.cancel();
@@ -190,9 +218,9 @@ public class SnitchMap extends MapActivity implements OnClickListener {
                 public void run() {
                 	if(secondCounter >= timerInterval){
                 		//put in texting
-                		if(seekerArray != null){
+                		if(seekerArray != null) {
                 			for(int j = 0 ; j < seekerArray.size(); j++){
-                				String textContent = "@!#gp:" + myLocationOverlay.getMyLocation().toString();
+                				String textContent = Ref.GEOPOINT + myLocationOverlay.getMyLocation().toString();
                 				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, textContent, null, null);
                 			}
                 		}

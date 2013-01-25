@@ -36,7 +36,7 @@ public class SeekerMainPage extends Activity implements OnClickListener{
 	private EditText box;
 	private static final int CONTACT_PICKER_RESULT = 1001; 
 	String num = "";
-	String defaultNumber = "";
+	String snitchNumber = "";
 	SmsManager sm = SmsManager.getDefault();
 	Drawable drawable;
 	
@@ -96,9 +96,9 @@ public class SeekerMainPage extends Activity implements OnClickListener{
     		alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
     		public void onClick(DialogInterface dialog, int whichButton) {
     			String value = input.getText().toString();
-    			SharedPreferences sp = getSharedPreferences(CmiycJavaRes.STORED_PREFERENCES_KEY, MODE_PRIVATE);
+    			SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
     	    	Editor spEditor = sp.edit();
-    			spEditor.putString(CmiycJavaRes.USERNAME_KEY, value);
+    			spEditor.putString(Ref.USERNAME_KEY, value);
     		  	spEditor.commit();
     		  }
     		});
@@ -119,7 +119,7 @@ public class SeekerMainPage extends Activity implements OnClickListener{
     @Override
     public void onResume(){
     	super.onResume();
-    	CmiycJavaRes.activityState = CmiycJavaRes.SEEKERMAIN;
+    	Ref.activityState = Ref.SEEKERMAIN;
     	
     }
    
@@ -186,15 +186,15 @@ public class SeekerMainPage extends Activity implements OnClickListener{
     }
 
     public boolean checkIfRealNumber(String x) {
-    	defaultNumber = x.replace("(", "");
-    	defaultNumber = defaultNumber.replace(")", "").replace(" ", "").replace("-", "").replace("+", "");
-		if(defaultNumber.length() == 11) {
+    	snitchNumber = x.replace("(", "");
+    	snitchNumber = snitchNumber.replace(")", "").replace(" ", "").replace("-", "").replace("+", "");
+		if(snitchNumber.length() == 11) {
 		    return true;
-		} else if(defaultNumber.length() == 12) {
+		} else if(snitchNumber.length() == 12) {
 		    return true;
-		} else if(defaultNumber.length() == 10) {
+		} else if(snitchNumber.length() == 10) {
 		    return true;
-		} else if(defaultNumber.length() == 7) {
+		} else if(snitchNumber.length() == 7) {
 		    return true;
 		} else {
 		    return false;
@@ -218,12 +218,12 @@ public class SeekerMainPage extends Activity implements OnClickListener{
 		} else if(v.equals(findViewById(R.id.start_button))) {
 			num = box.getText().toString();
 			if(checkIfRealNumber(num) == true) {
-				//defaultNumber stores the phone number to text this is where you send out something to the snitch
-				SharedPreferences sp = getSharedPreferences(CmiycJavaRes.STORED_PREFERENCES_KEY, MODE_PRIVATE);
+				//defaultNumber stores the phone number to text. this is where you send out something to the snitch
+				SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
 		    	Editor spEditor = sp.edit();
-		    	String username = sp.getString(CmiycJavaRes.USERNAME_KEY, defaultNumber);
-				seekerWaitIntent.putExtra("snitchNumber", defaultNumber);
-				sm.sendTextMessage(defaultNumber, null, "@!#seekerJoin" + ";seekerName:" + username, null, null);
+		    	String username = sp.getString(Ref.USERNAME_KEY, snitchNumber);
+				seekerWaitIntent.putExtra(Ref.SNITCH_NUMBER_KEY, snitchNumber);
+				sm.sendTextMessage(snitchNumber, null, Ref.IM_IN + username, null, null);
 				this.startActivity(seekerWaitIntent);
 				finish();
 			} else {

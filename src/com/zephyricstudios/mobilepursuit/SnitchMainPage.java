@@ -102,7 +102,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         
         timerInterval = 30;
         
-        CmiycJavaRes.activityState = CmiycJavaRes.SNITCHMAIN;
+        Ref.activityState = Ref.SNITCHMAIN;
         
         localTextReceiver = new BroadcastReceiver(){
 
@@ -121,9 +121,9 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 				        }
 
 				        for (SmsMessage currentMessage : messages) {
-				        	if(currentMessage.getDisplayMessageBody().contains("@!#seekerJoin;seekerName:")){ 
+				        	if(currentMessage.getDisplayMessageBody().contains(Ref.IM_IN)){ 
 				        		Seeker.createSeeker(currentMessage.getDisplayOriginatingAddress(),
-				        				currentMessage.getDisplayMessageBody().replace("@!#seekerJoin;seekerName:", ""),
+				        				currentMessage.getDisplayMessageBody().replace(Ref.IM_IN, ""),
 				        				seekerArray, adapter);
 				        		this.abortBroadcast();
 				        		
@@ -173,7 +173,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         	
         };
         filter = new IntentFilter();
-        filter.addAction(CmiycJavaRes.ACTION);
+        filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
     }
 
@@ -192,7 +192,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     @Override
     public void onResume(){
     	super.onResume();
-    	CmiycJavaRes.activityState = CmiycJavaRes.SNITCHMAIN;
+    	Ref.activityState = Ref.SNITCHMAIN;
     	this.registerReceiver(this.localTextReceiver, filter);
     }
     
@@ -201,7 +201,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     	if(v.equals(findViewById(R.id.snitch_start_button))) {
     		if(!seekerArray.isEmpty()){
     			i = new Intent(this, SnitchMap.class);
-    			String textContent = "@!#seekerConfirm;int:" + timerInterval;
+    			String textContent = Ref.GAME_START + timerInterval;
     			
     			sendingLayout.setVisibility(View.VISIBLE);
     			
@@ -212,8 +212,8 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     			//CmiycJavaRes.activityState = CmiycJavaRes.SNITCHMAP;
     			//i.putStringArrayListExtra(CmiycJavaRes.SEEKER_NUMBERS_KEY, seekerNumbers);
     			//i.putStringArrayListExtra(CmiycJavaRes.SEEKER_NAMES_KEY, seekerNames);
-    			i.putParcelableArrayListExtra(CmiycJavaRes.SEEKER_ARRAY_KEY, seekerArray);
-    			i.putExtra(CmiycJavaRes.TIMER_INTERVAL_KEY, timerInterval);
+    			i.putParcelableArrayListExtra(Ref.SEEKER_ARRAY_KEY, seekerArray);
+    			i.putExtra(Ref.TIMER_INTERVAL_KEY, timerInterval);
     			this.startActivity(i);
     			finish();
     		} else {

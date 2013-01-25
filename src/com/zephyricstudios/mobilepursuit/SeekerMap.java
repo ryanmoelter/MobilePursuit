@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -32,7 +33,6 @@ import android.view.View.OnClickListener;
 import android.graphics.Typeface;
 import android.widget.TextView;
 
-//This is a fantastic test line!
 
 public class SeekerMap extends MapActivity implements OnClickListener {
 	
@@ -48,12 +48,15 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	int secondCounter;
 	Timer timer;
 	
+	SmsManager sm = SmsManager.getDefault();
 	BroadcastReceiver localTextReceiver;
 	IntentFilter filter;
 	
 	// Typeface
 	Typeface thin;
 	TextView seekerTimer;
+	
+	String snitchNumber;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,9 +79,10 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         thin = Typeface.createFromAsset(getAssets(), "roboto_thin.ttf");
         seekerTimer.setTypeface(thin);
         
-        CmiycJavaRes.activityState = CmiycJavaRes.SEEKERMAP;
+        Ref.activityState = Ref.SEEKERMAP;
         
-        timerInterval = this.getIntent().getExtras().getInt(CmiycJavaRes.TIMER_INTERVAL_KEY);
+        timerInterval = this.getIntent().getExtras().getInt(Ref.TIMER_INTERVAL_KEY);
+        snitchNumber = this.getIntent().getExtras().getString(Ref.SNITCH_NUMBER_KEY);
         secondCounter = 0;
         localTextReceiver = new BroadcastReceiver(){
 
@@ -96,15 +100,15 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 				        }
 
 				        for (SmsMessage currentMessage : messages) {
-				        	if(currentMessage.getDisplayMessageBody().contains("@!#gp:")){
-				        		String geoStringTemp = currentMessage.getDisplayMessageBody().replace("@!#gp:", "");
-				        		GeoPoint geoPointTemp = CmiycJavaRes.stringToGeoPoint(geoStringTemp); 	//add textview to display								
+				        	if(currentMessage.getDisplayMessageBody().contains(Ref.GEOPOINT)){
+				        		String geoStringTemp = currentMessage.getDisplayMessageBody().replace(Ref.GEOPOINT, "");
+				        		GeoPoint geoPointTemp = Ref.stringToGeoPoint(geoStringTemp); 	//add textview to display								
 				        		addMarker(geoPointTemp); 												
 				        		
 				        		resetCounter(); //Reset the timer
 				        		
 				        		this.abortBroadcast();
-				        	}  else if(currentMessage.getDisplayMessageBody().contains("@!#gameOver")){
+				        	}  else if(currentMessage.getDisplayMessageBody().contains(Ref.GAME_OVER)){
 			        			Intent i = new Intent(context, GameOverPage.class);
 			        			startActivity(i);
 			        			this.abortBroadcast();
@@ -119,7 +123,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         	
         };
         filter = new IntentFilter();
-        filter.addAction(CmiycJavaRes.ACTION);
+        filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
 
 	}
@@ -144,7 +148,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 		super.onResume();
 		// when our activity resumes, we want to register for location updates
     	myLocationOverlay.enableMyLocation();
-        CmiycJavaRes.activityState = CmiycJavaRes.SEEKERMAP;
+        Ref.activityState = Ref.SEEKERMAP;
         //this.registerReceiver(this.localTextReceiver, filter);
 
 	}
@@ -169,6 +173,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	            alertDialog.setMessage("Do you really want to go back? This will remove you from the game!");
 	            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
 	              public void onClick(DialogInterface dialog, int which) {
+	            	  sendImOut();
 	                  finish();
 	                return;
 	            } }); 
@@ -200,7 +205,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 
                 public void run() {
                 	if(secondCounter>=timerInterval){
-                		secondCounter = 0;
+                		secondCounter = timerInterval;
                 	}
                 	int countdownSeconds = timerInterval - secondCounter;
             		int displayMinutes = countdownSeconds / 60;
@@ -214,6 +219,10 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	
 	public void resetCounter() {
 		secondCounter = 0;
+	}
+	
+	public void sendImOut() {
+		sm.sendTextMessage(snitchNumber, null, Ref.IM_OUT, null, null);
 	}
 }
 

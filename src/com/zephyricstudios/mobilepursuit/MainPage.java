@@ -52,12 +52,12 @@ public class MainPage extends Activity implements OnClickListener {
     	textMainSnitch.setTypeface(light);
     	textMainConfused.setTypeface(light);
     	
-    	CmiycJavaRes.activityState = CmiycJavaRes.MAIN;
+    	Ref.activityState = Ref.MAIN;
     	
-    	SharedPreferences sp = getSharedPreferences(CmiycJavaRes.STORED_PREFERENCES_KEY, MODE_PRIVATE);
+    	SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
     	Editor spEditor = sp.edit();  //use these two lines anywhere I want to use/edit shared prefs
     	
-    	if(sp.getString("username", CmiycJavaRes.SHARED_PREFS_DEFAULT).equals(CmiycJavaRes.SHARED_PREFS_DEFAULT)){
+    	if(sp.getString("username", Ref.SHARED_PREFS_DEFAULT).equals(Ref.SHARED_PREFS_DEFAULT)){
     		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
     		alert.setTitle("Enter User Name");
@@ -70,9 +70,9 @@ public class MainPage extends Activity implements OnClickListener {
     		alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
     		public void onClick(DialogInterface dialog, int whichButton) {
     			String value = input.getText().toString();
-    			SharedPreferences sp = getSharedPreferences(CmiycJavaRes.STORED_PREFERENCES_KEY, MODE_PRIVATE);
+    			SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
     	    	Editor spEditor = sp.edit();
-    			spEditor.putString(CmiycJavaRes.USERNAME_KEY, value);
+    			spEditor.putString(Ref.USERNAME_KEY, value);
     		  	spEditor.commit();
     		  }
     		});
@@ -86,7 +86,7 @@ public class MainPage extends Activity implements OnClickListener {
     		alert.show();
     	}
     	
-    	sp.getString("username", CmiycJavaRes.SHARED_PREFS_DEFAULT);
+    	sp.getString("username", Ref.SHARED_PREFS_DEFAULT);
     	
     }
     
@@ -113,9 +113,9 @@ public class MainPage extends Activity implements OnClickListener {
     		alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
     		public void onClick(DialogInterface dialog, int whichButton) {
     			String value = input.getText().toString();
-    			SharedPreferences sp = getSharedPreferences(CmiycJavaRes.STORED_PREFERENCES_KEY, MODE_PRIVATE);
+    			SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
     	    	Editor spEditor = sp.edit();
-    			spEditor.putString(CmiycJavaRes.USERNAME_KEY, value);
+    			spEditor.putString(Ref.USERNAME_KEY, value);
     		  	spEditor.commit();
     		  }
     		});
@@ -136,7 +136,7 @@ public class MainPage extends Activity implements OnClickListener {
     @Override
     public void onResume(){
     	super.onResume();
-    	CmiycJavaRes.activityState = CmiycJavaRes.MAIN;
+    	Ref.activityState = Ref.MAIN;
     	
     }
     

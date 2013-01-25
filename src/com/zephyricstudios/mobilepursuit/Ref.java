@@ -1,10 +1,8 @@
 package com.zephyricstudios.mobilepursuit;
 
 import com.google.android.maps.GeoPoint;
-import java.util.ArrayList;
-import com.zephyricstudios.mobilepursuit.Seeker;
 
-public class CmiycJavaRes {
+public class Ref {
 	
 	static final int MAIN = 115;
 	static final int SEEKERMAIN = 215;
@@ -24,6 +22,14 @@ public class CmiycJavaRes {
 	static final String STORED_PREFERENCES_KEY = "StoredPrefs";
 	static final String SHARED_PREFS_DEFAULT = "nope";
 	static final String USERNAME_KEY = "username";
+	static final String SNITCH_NUMBER_KEY = "snitch number";
+	
+	//Texting codes
+	static final String IM_IN =".I'm in. ";
+	static final String IM_OUT = ".I'm out";
+	static final String GEOPOINT = ".gp: ";
+	static final String GAME_START = ".Start game. ";
+	static final String GAME_OVER = ".Game over";
 	
 	static int activityState;
 	
