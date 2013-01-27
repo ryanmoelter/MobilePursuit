@@ -36,9 +36,18 @@ public class Seeker implements Parcelable {
 		for(int i = 0; i < array.size(); i++) {
 			if(array.get(i).getNumber().equals(number) ) {
 				array.remove(i);
-				return;
 			}
 		}
+		return;
+	}
+	
+	public static String getSeekerNameByNum(String number, ArrayList<Seeker> array) {
+		for(int i = 0; i < array.size(); i++) {
+			if(array.get(i).getNumber().equals(number) ) {
+				return array.get(i).getName();
+			}
+		}
+		return "Error";
 	}
 	
 	/* everything below here is for implementing Parcelable */

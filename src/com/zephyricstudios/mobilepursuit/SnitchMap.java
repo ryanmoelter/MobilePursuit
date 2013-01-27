@@ -18,6 +18,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.telephony.SmsManager;
@@ -28,6 +29,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import android.graphics.Typeface;
 
@@ -53,6 +55,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	TextView textTagged;
 	
 	BroadcastReceiver localTextReceiver;
+	IntentFilter filter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -96,8 +99,12 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 
 				        for (SmsMessage currentMessage : messages) {
 				        	if(currentMessage.getDisplayMessageBody().contains(Ref.IM_OUT)){
+				        		//Context cont = getApplicationContext();
+				    			CharSequence text = (Seeker.getSeekerNameByNum(currentMessage.getDisplayOriginatingAddress(), seekerArray) + "has left the game.");
+				    			int duration = Toast.LENGTH_SHORT;
+				    			Toast toast = Toast.makeText(context, text, duration);
+				    			toast.show();
 				        		Seeker.deleteSeekerByNum(currentMessage.getDisplayOriginatingAddress(), seekerArray);
-				        		
 				        		this.abortBroadcast();
 				        	}
 				               //currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
@@ -108,6 +115,10 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 			}
         	
         };
+        
+        filter = new IntentFilter();
+        filter.addAction(Ref.ACTION);
+        this.registerReceiver(this.localTextReceiver, filter);
         
 	}
 
