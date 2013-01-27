@@ -231,7 +231,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
                 		//put in texting
                 		if(seekerArray != null) {
                 			for(int j = 0 ; j < seekerArray.size(); j++){
-                				String textContent = Ref.GEOPOINT + myLocationOverlay.getMyLocation().toString();
+                				String textContent = Ref.GEOPOINT + String.valueOf(myLocationOverlay.getMyLocation());
                 				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, textContent, null, null);
                 			}
                 		}
