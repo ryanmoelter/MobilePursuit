@@ -55,7 +55,8 @@ public final class R {
         public static final int loading_layout=0x7f080036;
         public static final int mapview=0x7f08003a;
         public static final int mapview_seeker=0x7f080023;
-        public static final int menu_change_name=0x7f080040;
+        public static final int menu_change_name=0x7f080041;
+        public static final int menu_settings=0x7f080040;
         public static final int progressBar=0x7f080038;
         public static final int progressBar1=0x7f080026;
         public static final int scrollView1=0x7f080001;
@@ -99,24 +100,26 @@ public final class R {
     }
     public static final class layout {
         public static final int activity_confused=0x7f030000;
-        public static final int activity_game_over_page=0x7f030001;
-        public static final int activity_main_page=0x7f030002;
-        public static final int activity_seeker_main_page=0x7f030003;
-        public static final int activity_seeker_map=0x7f030004;
-        public static final int activity_seeker_waiting=0x7f030005;
-        public static final int activity_snitch_main_page=0x7f030006;
-        public static final int activity_snitch_map=0x7f030007;
-        public static final int list_item=0x7f030008;
+        public static final int activity_confused_menu=0x7f030001;
+        public static final int activity_game_over_page=0x7f030002;
+        public static final int activity_main_page=0x7f030003;
+        public static final int activity_seeker_main_page=0x7f030004;
+        public static final int activity_seeker_map=0x7f030005;
+        public static final int activity_seeker_waiting=0x7f030006;
+        public static final int activity_snitch_main_page=0x7f030007;
+        public static final int activity_snitch_map=0x7f030008;
+        public static final int list_item=0x7f030009;
     }
     public static final class menu {
         public static final int activity_confused=0x7f070000;
-        public static final int activity_game_over_page=0x7f070001;
-        public static final int activity_main_page=0x7f070002;
-        public static final int activity_seeker_main_page=0x7f070003;
-        public static final int activity_seeker_map=0x7f070004;
-        public static final int activity_seeker_waiting=0x7f070005;
-        public static final int activity_snitch_main_page=0x7f070006;
-        public static final int activity_snitch_map=0x7f070007;
+        public static final int activity_confused_menu=0x7f070001;
+        public static final int activity_game_over_page=0x7f070002;
+        public static final int activity_main_page=0x7f070003;
+        public static final int activity_seeker_main_page=0x7f070004;
+        public static final int activity_seeker_map=0x7f070005;
+        public static final int activity_seeker_waiting=0x7f070006;
+        public static final int activity_snitch_main_page=0x7f070007;
+        public static final int activity_snitch_map=0x7f070008;
     }
     public static final class string {
         public static final int access_confused=0x7f050019;
@@ -184,6 +187,7 @@ public final class R {
          */
         public static final int timer=0x7f050024;
         public static final int title_activity_confused=0x7f050009;
+        public static final int title_activity_confused_menu=0x7f05003d;
         /**  Game Over layout 
          */
         public static final int title_activity_game_over_page=0x7f050028;

@@ -103,9 +103,10 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 				        for (SmsMessage currentMessage : messages) {
 				        	if(currentMessage.getDisplayMessageBody().contains("null")){
 				    			CharSequence text = ("The snitch's last location could not be found.");
-				    			int duration = Toast.LENGTH_SHORT;
+				    			int duration = Toast.LENGTH_LONG;
 				    			Toast toast = Toast.makeText(context, text, duration);
 				    			toast.show();
+				    			resetCounter();
 				        		this.abortBroadcast();
 				        	}else if(currentMessage.getDisplayMessageBody().contains(Ref.GEOPOINT)){
 				        		String geoStringTemp = currentMessage.getDisplayMessageBody().replace(Ref.GEOPOINT, "");
