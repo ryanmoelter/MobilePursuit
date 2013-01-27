@@ -32,6 +32,7 @@ import android.view.View.OnClickListener;
 //Typeface
 import android.graphics.Typeface;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class SeekerMap extends MapActivity implements OnClickListener {
@@ -100,7 +101,13 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 				        }
 
 				        for (SmsMessage currentMessage : messages) {
-				        	if(currentMessage.getDisplayMessageBody().contains(Ref.GEOPOINT)){
+				        	if(currentMessage.getDisplayMessageBody().contains("null")){
+				    			CharSequence text = ("The snitch's last location could not be found.");
+				    			int duration = Toast.LENGTH_SHORT;
+				    			Toast toast = Toast.makeText(context, text, duration);
+				    			toast.show();
+				        		this.abortBroadcast();
+				        	}else if(currentMessage.getDisplayMessageBody().contains(Ref.GEOPOINT)){
 				        		String geoStringTemp = currentMessage.getDisplayMessageBody().replace(Ref.GEOPOINT, "");
 				        		GeoPoint geoPointTemp = Ref.stringToGeoPoint(geoStringTemp); 	//add textview to display								
 				        		addMarker(geoPointTemp); 												
@@ -108,7 +115,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 				        		resetCounter(); //Reset the timer
 				        		
 				        		this.abortBroadcast();
-				        	}  else if(currentMessage.getDisplayMessageBody().contains(Ref.GAME_OVER)){
+				        	}else if(currentMessage.getDisplayMessageBody().contains(Ref.GAME_OVER)){
 			        			Intent i = new Intent(context, GameOverPage.class);
 			        			startActivity(i);
 			        			this.abortBroadcast();
