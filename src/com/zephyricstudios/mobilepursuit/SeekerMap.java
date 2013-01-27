@@ -31,6 +31,7 @@ import android.view.View.OnClickListener;
 //Typeface
 import android.graphics.Typeface;
 import android.widget.TextView;
+import android.widget.Toast;
 
 //This is a fantastic test line!
 
@@ -99,7 +100,15 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 				        	if(currentMessage.getDisplayMessageBody().contains("@!#gp:")){
 				        		String geoStringTemp = currentMessage.getDisplayMessageBody().replace("@!#gp:", "");
 				        		GeoPoint geoPointTemp = CmiycJavaRes.stringToGeoPoint(geoStringTemp); 	//add textview to display								
-				        		addMarker(geoPointTemp); 												
+				        		addMarker(geoPointTemp);
+				        		if(currentMessage.getDisplayMessageBody().contains("null")){
+				        			Context tempContext = getApplicationContext();
+				        			CharSequence text = "At least one seeker is required to continue";
+				        			int duration = Toast.LENGTH_SHORT;
+
+				        			Toast toast = Toast.makeText(tempContext, text, duration);
+				        			toast.show();
+				        		}
 				        		this.abortBroadcast();
 				        	}  else if(currentMessage.getDisplayMessageBody().contains("@!#gameOver")){
 			        			Intent i = new Intent(context, GameOverPage.class);

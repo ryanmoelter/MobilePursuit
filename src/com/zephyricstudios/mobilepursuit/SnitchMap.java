@@ -14,6 +14,7 @@ import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,7 +35,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	ArrayList<GeoPoint> geoPoints = new ArrayList<GeoPoint>(); // used to dynamically store geopoints
 	
 	MapView mapView;                              // declaring these variables here (but not initializing them!)
-	MyLocationOverlay myLocationOverlay;          // allows them to be referenced in multiple methods
+	MyLocationOverlay myLocationOverlay;          // allows them to be referenced in multiple methods (I think)
 	List<Overlay> mapOverlays;
 	MapsItemizedOverlay itemizedoverlay;
 	Drawable drawable;
@@ -45,6 +46,8 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	int timerInterval;
 	int secondCounter;
 	RelativeLayout buttonSnitchTagged;
+	
+	BroadcastReceiver localTextReceiver;
 	
 	// Typeface
 	Typeface thin, light;
@@ -112,32 +115,35 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 
 	public void onClick(View buttonClicked) {
 		if(buttonClicked == buttonSnitchTagged){
-			/*AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 			alertDialog.setTitle("End Game?");
 			alertDialog.setIcon(R.drawable.ic_launcher);
 			alertDialog.setMessage("Do you want to end the game?");
 			alertDialog.setButton("Yes", new DialogInterface.OnClickListener() {
 	              public void onClick(DialogInterface dialog, int which) {
-	            	  Intent i = new Intent(idk, GameOverPage.class);
+	            	  myLocationOverlay.disableMyLocation();
+	            	  timer.cancel();
+	            	  for(int j =0;j<seekerNumbers.size();j++){
+	      				String textContent = "@!#gameOver";
+	      				sm.sendTextMessage(seekerNumbers.get(j), null, textContent, null, null);
+	      				}
+	            	  Intent i = new Intent(getApplicationContext(), GameOverPage.class);
 	            	  startActivity(i);
 	                  finish();
 	                return;
 	            } }); 
 	            alertDialog.setButton2("No", new DialogInterface.OnClickListener() {
 	              public void onClick(DialogInterface dialog, int which) {
-	                  dialog.cancel();
+	            	  dialog.cancel();
 	                return;
 	            }}); 
-	              alertDialog.show();*/
-			for(int j =0;j<seekerNumbers.size();j++){
-				String textContent = "@!#gameOver";
-				sm.sendTextMessage(seekerNumbers.get(j), null, textContent, null, null);
-			}
-			myLocationOverlay.disableMyLocation();
+	              alertDialog.show();
+			
+			/*myLocationOverlay.disableMyLocation();
 			timer.cancel();
 			Intent i = new Intent(this, GameOverPage.class);
 			startActivity(i);
-			finish();
+			finish();*/
 		}
 	}
 	
@@ -186,9 +192,11 @@ public class SnitchMap extends MapActivity implements OnClickListener {
                 public void run() {
                 	if(secondCounter>=timerInterval){
                 		//put in texting
-                		if(seekerNumbers!=null){
+                		if(seekerNumbers!=null && (true)){
                 			for(int j =0;j<seekerNumbers.size();j++){
-                				String textContent = "@!#gp:" + myLocationOverlay.getMyLocation().toString();
+                				GeoPoint tempGeoPoint = myLocationOverlay.getMyLocation();
+                				String tempString = String.valueOf(tempGeoPoint);
+                				String textContent = "@!#gp:" + tempString;
                 				sm.sendTextMessage(seekerNumbers.get(j), null, textContent, null, null);
                 			}
                 		}
