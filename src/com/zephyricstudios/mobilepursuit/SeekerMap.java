@@ -111,7 +111,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 				        	}else if(currentMessage.getDisplayMessageBody().contains(Ref.GEOPOINT)){
 				        		String geoStringTemp = currentMessage.getDisplayMessageBody().replace(Ref.GEOPOINT, "");
 				        		GeoPoint geoPointTemp = Ref.stringToGeoPoint(geoStringTemp); 	//add textview to display								
-				        		addMarker(geoPointTemp); 												
+				        		addMarker(geoPointTemp);
 				        		
 				        		resetCounter(); //Reset the timer
 				        		
