@@ -68,6 +68,10 @@
             android:label="@string/title_activity_game_over_page"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="com.zephyricstudios.mobilepursuit.ConfusedMenu"
+            android:label="@string/title_activity_confused_menu" >
+        </activity>
     </application>
 
 </manifest>

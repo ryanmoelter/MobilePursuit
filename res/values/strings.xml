@@ -52,25 +52,23 @@
     <string name="pick_contact">Select from contacts</string>
     <string name="or">or</string>
     <string name="seeker_continue">Continue</string>
-    
+
     <!-- Snitch Map layout -->
-    
+
     <string name="game_over">Game Over</string>
 
     <!-- SeekerMap layout -->
     <string name="timer">0:23</string>
-    
-    
     <string name="go_to_seeker_map">Click Me!</string>
     <string name="title_activity_settings_page">SettingsPage</string>
     <string name="settings_complete">Save and Return</string>
-    
+
     <!-- Game Over layout -->
     <string name="title_activity_game_over_page">GameOverPage</string>
     <string name="play_again">Play Again</string>
     <string name="game">Game</string>
     <string name="over">Over</string>
-    
+
     <!-- Confused layout -->
     <string name="confused_title">How To Play</string>
     <string name="confused_objective_title">What is this?</string>
@@ -85,10 +83,10 @@
     <string name="confused_seeker_body">Go get ‘em, tiger! All you have to do is find the snitch! You have a map, and you get their location every 30 or so seconds, so this should be easy… Right?</string>
     <string name="confused_end_title">Does this end?</string>
     <string name="confused_game_body">The game ends when the snitch presses the “Game Over” button; you and your friends decide if that happens on sight or on tag. Have fun!</string>
-    
     <string name="s15s">15 seconds</string>
     <string name="s30s">30 seconds</string>
     <string name="s45s">45 seconds</string>
     <string name="s1m">1 minute</string>
+    <string name="title_activity_confused_menu">ConfusedMenu</string>
 
 </resources>
