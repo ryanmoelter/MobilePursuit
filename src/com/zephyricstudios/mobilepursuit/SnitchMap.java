@@ -100,7 +100,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 				        for (SmsMessage currentMessage : messages) {
 				        	if(currentMessage.getDisplayMessageBody().contains(Ref.IM_OUT)){
 				        		//Context cont = getApplicationContext();
-				    			CharSequence text = (Seeker.getSeekerNameByNum(currentMessage.getDisplayOriginatingAddress(), seekerArray) + "has left the game.");
+				    			CharSequence text = (Seeker.getSeekerNameByNum(currentMessage.getDisplayOriginatingAddress(), seekerArray) + " has left the game.");
 				    			int duration = Toast.LENGTH_SHORT;
 				    			Toast toast = Toast.makeText(context, text, duration);
 				    			toast.show();
