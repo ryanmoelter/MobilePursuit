@@ -157,23 +157,6 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 
 	public void onClick(View buttonClicked) {
 		if(buttonClicked == buttonSnitchTagged){
-			/*AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-			alertDialog.setTitle("End Game?");
-			alertDialog.setIcon(R.drawable.ic_launcher);
-			alertDialog.setMessage("Do you want to end the game?");
-			alertDialog.setButton("Yes", new DialogInterface.OnClickListener() {
-	              public void onClick(DialogInterface dialog, int which) {
-	            	  Intent i = new Intent(idk, GameOverPage.class);
-	            	  startActivity(i);
-	                  finish();
-	                return;
-	            } }); 
-	            alertDialog.setButton2("No", new DialogInterface.OnClickListener() {
-	              public void onClick(DialogInterface dialog, int which) {
-	                  dialog.cancel();
-	                return;
-	            }}); 
-	              alertDialog.show();*/
 			for(int j =0;j<seekerArray.size();j++){
 				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, Ref.GAME_OVER, null, null);
 			}
