@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">Mobile Pursuit</string>
-    <string name="hello_world">Hello world!</string>
 
     <!-- Menu -->
     <string name="menu_settings">Settings</string>
@@ -12,9 +11,9 @@
 
     <!-- Activity Titles -->
     <string name="title_activity_main_page">Mobile Pursuit</string>
-    <string name="title_activity_seeker_main_page">SeekerMainPage</string>
-    <string name="title_activity_snitch_main_page">SnitchMainPage</string>
-    <string name="title_activity_confused">Confused</string>
+    <string name="title_activity_seeker_main_page">Seeker</string>
+    <string name="title_activity_snitch_main_page">Snitch</string>
+    <string name="title_activity_confused">How to Play</string>
 
     <!-- Main Page layout -->
     <string name="i_am">I am&#8230;</string>
@@ -69,8 +68,8 @@
     <string name="game">Game</string>
     <string name="over">Over</string>
 
-    <!-- Confused layout -->
-    <string name="confused_title">How To Play</string>
+    <!-- How to Play (Confused.java) layout -->
+    <string name="how_to_play">How To Play</string>
     <string name="confused_objective_title">What is this?</string>
     <string name="confused_objective_body">Catch Me If You Can is a multiplayer game similar to tag. There is one “snitch,” whom all of the “seekers” are trying to find.</string>
     <string name="confused_objective_body_2">The seekers get the snitch’s location every 30 seconds (by default, but you can change this in the settings).</string>
@@ -87,6 +86,12 @@
     <string name="s30s">30 seconds</string>
     <string name="s45s">45 seconds</string>
     <string name="s1m">1 minute</string>
-    <string name="title_activity_confused_menu">ConfusedMenu</string>
+    
+    <string name="title_activity_confused_menu">Confused</string>
+    
+    <!-- Confused Menu Layout -->
+    <string name="confused_how_to_play">how to play</string>
+    <string name="change_name">change name</string>
+    <string name="about">about</string>
 
 </resources>

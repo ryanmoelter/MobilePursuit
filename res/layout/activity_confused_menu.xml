@@ -3,12 +3,63 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ConfusedMenu" >
-
-    <TextView
-        android:layout_width="wrap_content"
+    
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="@string/hello_world" />
+        android:orientation="horizontal"
+        android:weightSum="10" >
+        
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            android:orientation="vertical"
+            android:layout_gravity="right|center_vertical" >
+            
+            <TextView
+                android:id="@+id/how_to_play"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/confused_how_to_play"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:drawableRight="@drawable/how_to_play"
+                android:drawablePadding="20dp"
+                android:gravity="right|center_vertical"
+                android:clickable="true" />
+            
+            <TextView
+                android:id="@+id/change_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/change_name"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:drawableRight="@drawable/change_name"
+                android:drawablePadding="20dp"
+                android:gravity="right|center_vertical"
+                android:clickable="true" />
+            
+            <TextView
+                android:id="@+id/about"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/about"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:drawableRight="@drawable/confused_icon"
+                android:drawablePadding="20dp"
+                android:gravity="right|center_vertical"
+                android:clickable="true" />
+            
+        </LinearLayout>
+        
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+        
+    </LinearLayout>
 
 </RelativeLayout>

@@ -104,7 +104,7 @@ public class MainPage extends Activity implements OnClickListener {
 	    	AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
     		alert.setTitle("Enter User Name");
-    		alert.setMessage("Please enter your name.");
+    		alert.setMessage("Please enter your new name.");
 
     		// Set an EditText view to get user input 
     		final EditText input = new EditText(this);
@@ -113,10 +113,12 @@ public class MainPage extends Activity implements OnClickListener {
     		alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
     		public void onClick(DialogInterface dialog, int whichButton) {
     			String value = input.getText().toString();
-    			SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
-    	    	Editor spEditor = sp.edit();
-    			spEditor.putString(Ref.USERNAME_KEY, value);
-    		  	spEditor.commit();
+    			if(value != "") {
+    				SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
+    	    		Editor spEditor = sp.edit();
+    				spEditor.putString(Ref.USERNAME_KEY, value);
+    		  		spEditor.commit();
+    			}
     		  }
     		});
 
@@ -167,7 +169,7 @@ public class MainPage extends Activity implements OnClickListener {
 			i = new Intent(this, SeekerMainPage.class);
 			//CmiycJavaRes.activityState = CmiycJavaRes.SEEKERMAIN;
 		}else if(buttonChosen==buttonMainConfused){
-			i = new Intent(this, Confused.class);
+			i = new Intent(this, ConfusedMenu.class);
 			//CmiycJavaRes.activityState = CmiycJavaRes.CONFUSED;
 		}else{
 			i = null;

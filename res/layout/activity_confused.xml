@@ -10,7 +10,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="bottom|center_horizontal"
-        android:text="@string/confused_title"
+        android:text="@string/how_to_play"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="50sp" />
 
