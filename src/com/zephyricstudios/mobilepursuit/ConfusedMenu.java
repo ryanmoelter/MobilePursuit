@@ -52,6 +52,10 @@ public class ConfusedMenu extends Activity implements OnClickListener {
 		boolean launch = true;
 		if(chosen == howToPlay) {
 			i = new Intent(this, Confused.class); //old name for how to play
+			launch = true;
+		} else if(chosen == about) {
+			i = new Intent(this, About.class);
+			launch = true;
 		} else if(chosen == changeName) {
 			
 			//need to put this into function probably

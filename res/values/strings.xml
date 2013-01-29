@@ -86,12 +86,13 @@
     <string name="s30s">30 seconds</string>
     <string name="s45s">45 seconds</string>
     <string name="s1m">1 minute</string>
-    
     <string name="title_activity_confused_menu">Confused</string>
-    
+
     <!-- Confused Menu Layout -->
     <string name="confused_how_to_play">how to play</string>
     <string name="change_name">change name</string>
     <string name="about">about</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_about">About</string>
 
 </resources>

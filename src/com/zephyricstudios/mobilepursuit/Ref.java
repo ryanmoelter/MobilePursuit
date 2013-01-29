@@ -1,5 +1,13 @@
 package com.zephyricstudios.mobilepursuit;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.widget.EditText;
+
 import com.google.android.maps.GeoPoint;
 
 public class Ref {
@@ -53,4 +61,37 @@ public class Ref {
 			return null;
 		}
 	}
+	
+	// Having an issue with the getSharedPreferences() call
+	/*public static void changeName(Context context, ContextWrapper wrapper) {
+		SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
+		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+
+		alert.setTitle("Enter User Name");
+		alert.setMessage("Please enter your new name.");
+
+		// Set an EditText view to get user input 
+		final EditText input = new EditText(context);
+		alert.setView(input);
+
+		alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+			String value = input.getText().toString();
+			if(value != "") {
+				SharedPreferences sp = wrapper.getSharedPreferences(Ref.STORED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+	    		Editor spEditor = sp.edit();
+				spEditor.putString(Ref.USERNAME_KEY, value);
+		  		spEditor.commit();
+			}
+		  }
+		});
+
+		alert.setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
+		  public void onClick(DialogInterface dialog, int whichButton) {
+		    dialog.cancel();
+		  }
+		});
+
+		alert.show();
+	} */
 }

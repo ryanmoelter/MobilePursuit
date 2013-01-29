@@ -73,6 +73,11 @@
             android:label="@string/title_activity_confused_menu"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="com.zephyricstudios.mobilepursuit.About"
+            android:label="@string/title_activity_about"
+            android:screenOrientation="portrait" >
+        </activity>
     </application>
 
 </manifest>
