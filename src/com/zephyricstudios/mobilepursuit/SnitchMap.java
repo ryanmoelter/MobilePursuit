@@ -139,7 +139,8 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	@Override
 	protected void onStop(){
 		super.onStop();
-		//myLocationOverlay.disableMyLocation();
+		myLocationOverlay.disableMyLocation();
+		this.unregisterReceiver(this.localTextReceiver);
 	}
 	
 	@Override

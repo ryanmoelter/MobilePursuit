@@ -152,6 +152,12 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	}
 	
 	@Override
+	protected void onStop(){
+		super.onStop();
+		this.unregisterReceiver(this.localTextReceiver);
+	}
+	
+	@Override
 	protected void onResume(){
 		super.onResume();
 		// when our activity resumes, we want to register for location updates
