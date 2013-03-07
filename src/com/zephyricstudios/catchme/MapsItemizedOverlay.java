@@ -1,4 +1,4 @@
-package com.zephyricstudios.mobilepursuit;
+package com.zephyricstudios.catchme;
 
 import java.util.ArrayList;
 
@@ -8,7 +8,7 @@ import android.graphics.drawable.Drawable;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.OverlayItem;
 
-public class MapsItemizedOverlay extends ItemizedOverlay {
+public class MapsItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 	private ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
 	private Context mContext;
 
@@ -31,8 +31,8 @@ public class MapsItemizedOverlay extends ItemizedOverlay {
 	  return mOverlays.size();
 	}
 	
-	public void addOverlay(OverlayItem overlay) {
-	    mOverlays.add(overlay);
+	public void addOverlay(OverlayItem overlayItem) {
+	    mOverlays.add(overlayItem);
 	    populate();
 	}
 

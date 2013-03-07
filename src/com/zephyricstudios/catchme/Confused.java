@@ -1,4 +1,4 @@
-package com.zephyricstudios.mobilepursuit;
+package com.zephyricstudios.catchme;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -34,12 +34,6 @@ public class Confused extends Activity {
         endTitle.setTypeface(light);
         
         
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_confused, menu);
-        return true;
     }
     
     @Override

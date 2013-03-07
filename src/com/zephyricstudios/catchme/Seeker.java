@@ -1,4 +1,4 @@
-package com.zephyricstudios.mobilepursuit;
+package com.zephyricstudios.catchme;
 
 import java.util.ArrayList;
 import android.os.Parcel;

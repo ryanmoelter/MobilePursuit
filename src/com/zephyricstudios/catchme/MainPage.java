@@ -1,4 +1,4 @@
-package com.zephyricstudios.mobilepursuit;
+package com.zephyricstudios.catchme;
 
 import android.app.Activity;
 import android.app.AlertDialog;

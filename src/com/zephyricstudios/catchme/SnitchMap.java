@@ -1,11 +1,11 @@
-package com.zephyricstudios.mobilepursuit;
+package com.zephyricstudios.catchme;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.zephyricstudios.mobilepursuit.MapsItemizedOverlay;
+import com.zephyricstudios.catchme.MapsItemizedOverlay;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -120,13 +120,6 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
         
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_snitch_map, menu);
-		return true;
 	}
 	
 	@Override

@@ -1,11 +1,11 @@
-package com.zephyricstudios.mobilepursuit;
+package com.zephyricstudios.catchme;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.zephyricstudios.mobilepursuit.MapsItemizedOverlay;
+import com.zephyricstudios.catchme.MapsItemizedOverlay;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -135,13 +135,6 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         this.registerReceiver(this.localTextReceiver, filter);
 
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_snitch_map, menu);
-		return true;
-	}
 	
 	@Override
 	protected void onPause(){
@@ -162,7 +155,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 		super.onResume();
 		// when our activity resumes, we want to register for location updates
     	myLocationOverlay.enableMyLocation();
-        Ref.activityState = Ref.SEEKERMAP;
+        //Ref.activityState = Ref.SEEKERMAP;
         //this.registerReceiver(this.localTextReceiver, filter);
 
 	}
@@ -207,6 +200,8 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 		markerCounter++;
 		//mapView.setBuiltInZoomControls(true); 
 		itemizedoverlay.addOverlay(new OverlayItem(geoPointTemp, "Point " + markerCounter, null));
+		mapOverlays.clear();
+		mapOverlays.add(myLocationOverlay);
 		mapOverlays.add(itemizedoverlay);
 		mapView.postInvalidate();
 	}

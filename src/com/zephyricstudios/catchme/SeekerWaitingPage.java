@@ -1,4 +1,4 @@
-package com.zephyricstudios.mobilepursuit;
+package com.zephyricstudios.catchme;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -87,13 +87,6 @@ public class SeekerWaitingPage extends Activity {
 		filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_seeker_waiting, menu);
-		return true;
 	}
 	
 	@Override

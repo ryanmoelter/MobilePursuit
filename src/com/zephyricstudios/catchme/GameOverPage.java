@@ -1,4 +1,4 @@
-package com.zephyricstudios.mobilepursuit;
+package com.zephyricstudios.catchme;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -37,13 +37,6 @@ public class GameOverPage extends Activity implements OnClickListener {
 		
 		
 		
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_game_over_page, menu);
-		return true;
 	}
 
 	public void onClick(View btnClicked) {

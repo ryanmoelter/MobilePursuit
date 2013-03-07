@@ -1,4 +1,4 @@
-package com.zephyricstudios.mobilepursuit;
+package com.zephyricstudios.catchme;
 
 import java.util.ArrayList;
 import android.os.Bundle;
@@ -20,7 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.graphics.Typeface;
 import android.widget.ListView;
-import com.zephyricstudios.mobilepursuit.SeekerAdapter;
+
+import com.zephyricstudios.catchme.SeekerAdapter;
 
 public class SnitchMainPage extends Activity implements OnClickListener{
 	
@@ -175,12 +176,6 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_snitch_main_page, menu);
-        return true;
     }
     
     @Override
