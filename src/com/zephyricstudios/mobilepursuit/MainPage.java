@@ -55,28 +55,32 @@ public class MainPage extends Activity implements OnClickListener {
     	Ref.activityState = Ref.MAIN;
     	
     	SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
-    	Editor spEditor = sp.edit();  //use these two lines anywhere I want to use/edit shared prefs
+    	//Editor spEditor = sp.edit();  //use these two lines anywhere I want to use/edit shared prefs
     	
-    	if(sp.getString("username", Ref.SHARED_PREFS_DEFAULT).equals(Ref.SHARED_PREFS_DEFAULT)){
-    		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+    	if(sp.getString(Ref.USERNAME_KEY, Ref.SHARED_PREFS_DEFAULT).equals(Ref.SHARED_PREFS_DEFAULT)){
+    		
+    		Ref.changeName(this, true);
+    		
+    		/*AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
     		alert.setTitle("Enter User Name");
     		alert.setMessage("Please enter your name. You can change this at any time by pressing the menu button.");
 
     		// Set an EditText view to get user input 
     		final EditText input = new EditText(this);
+    		input.setText(sp.getString(Ref.USERNAME_KEY, Ref.SHARED_PREFS_DEFAULT));
     		alert.setView(input);
 
     		alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-    		public void onClick(DialogInterface dialog, int whichButton) {
-    			String value = input.getText().toString();
-    			if(value != "") {
-    				SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
-    	    		Editor spEditor = sp.edit();
-    				spEditor.putString(Ref.USERNAME_KEY, value);
-    		  		spEditor.commit();
+    			public void onClick(DialogInterface dialog, int whichButton) {
+    				String value = input.getText().toString();
+    				if(value != "") {
+    					SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
+    					Editor spEditor = sp.edit();
+    					spEditor.putString(Ref.USERNAME_KEY, value);
+    					spEditor.commit();
+    				}
     			}
-    		  }
     		});
 
     		alert.setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
@@ -85,10 +89,10 @@ public class MainPage extends Activity implements OnClickListener {
     		  }
     		});
 
-    		alert.show();
+    		alert.show(); */
     	}
     	
-    	sp.getString("username", Ref.SHARED_PREFS_DEFAULT);
+    	//sp.getString("username", Ref.SHARED_PREFS_DEFAULT);
     	
     }
     
@@ -103,7 +107,8 @@ public class MainPage extends Activity implements OnClickListener {
 	    // Handle item selection
 	    switch (item.getItemId()) {
 	    case R.id.menu_change_name:
-	    	AlertDialog.Builder alert = new AlertDialog.Builder(this);
+	    	Ref.changeName(this, false);
+	    	/*AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
     		alert.setTitle("Enter User Name");
     		alert.setMessage("Please enter your new name.");
@@ -130,7 +135,7 @@ public class MainPage extends Activity implements OnClickListener {
     		  }
     		});
 
-    		alert.show();
+    		alert.show(); */
 	        return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
@@ -148,18 +153,21 @@ public class MainPage extends Activity implements OnClickListener {
 		Intent i;
 		
 		// I couldn't get this to work...
-		/*switch (buttonChosen.getId()) {
+		switch (buttonChosen.getId()) {
 		case R.id.button_main_seeker:
 			i = new Intent(this, SeekerMainPage.class);
+			break;
 		case R.id.button_main_snitch:
 			i = new Intent(this, SnitchMainPage.class);
+			break;
 		case R.id.button_main_confused:
-			i = new Intent(this, Confused.class);
+			i = new Intent(this, ConfusedMenu.class);
+			break;
 		default:
 			i = null;
-		} */
+		}
 		
-		if(buttonChosen==buttonMainSnitch){
+		/*if(buttonChosen==buttonMainSnitch){
 			//buttonChosen.setBackgroundColor(getResources().getColor(R.color.accent));
 			i = new Intent(this, SnitchMainPage.class);
 			//CmiycJavaRes.activityState = CmiycJavaRes.SNITCHMAIN;
@@ -168,6 +176,7 @@ public class MainPage extends Activity implements OnClickListener {
 			if(saveName() == true){
 				i = new Intent(this, SeekerMainPage.class);
 			}*/
+		/*
 			i = new Intent(this, SeekerMainPage.class);
 			//CmiycJavaRes.activityState = CmiycJavaRes.SEEKERMAIN;
 		}else if(buttonChosen==buttonMainConfused){
@@ -175,7 +184,7 @@ public class MainPage extends Activity implements OnClickListener {
 			//CmiycJavaRes.activityState = CmiycJavaRes.CONFUSED;
 		}else{
 			i = null;
-		}
+		} */
 		
 		this.startActivity(i);
 		

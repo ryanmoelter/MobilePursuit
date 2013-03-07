@@ -63,8 +63,8 @@ public class Ref {
 	}
 	
 	// Having an issue with the getSharedPreferences() call
-	/*public static void changeName(Context context, ContextWrapper wrapper) {
-		SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
+	public static void changeName(final Context context, boolean firstTime) {
+		SharedPreferences sp = context.getSharedPreferences(Ref.STORED_PREFERENCES_KEY, Context.MODE_PRIVATE);
 		AlertDialog.Builder alert = new AlertDialog.Builder(context);
 
 		alert.setTitle("Enter User Name");
@@ -78,20 +78,23 @@ public class Ref {
 		public void onClick(DialogInterface dialog, int whichButton) {
 			String value = input.getText().toString();
 			if(value != "") {
-				SharedPreferences sp = wrapper.getSharedPreferences(Ref.STORED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+				SharedPreferences sp = context.getSharedPreferences(Ref.STORED_PREFERENCES_KEY, Context.MODE_PRIVATE);
 	    		Editor spEditor = sp.edit();
 				spEditor.putString(Ref.USERNAME_KEY, value);
 		  		spEditor.commit();
 			}
 		  }
 		});
-
+		
+		String negativeText = "Nevermind";
+		if(!firstTime) {
 		alert.setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
 		  public void onClick(DialogInterface dialog, int whichButton) {
 		    dialog.cancel();
 		  }
 		});
+		}
 
 		alert.show();
-	} */
+	}
 }

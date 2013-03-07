@@ -49,49 +49,20 @@ public class ConfusedMenu extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View chosen) {
 		Intent i = null;
-		boolean launch = true;
-		if(chosen == howToPlay) {
+		boolean launch = false;
+		switch(chosen.getId()) {
+		case R.id.how_to_play:
 			i = new Intent(this, Confused.class); //old name for how to play
 			launch = true;
-		} else if(chosen == about) {
+			break;
+		case R.id.about:
 			i = new Intent(this, About.class);
 			launch = true;
-		} else if(chosen == changeName) {
-			
-			//need to put this into function probably
-			
-			SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
-			AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-    		alert.setTitle("Enter User Name");
-    		alert.setMessage("Please enter your new name.");
-
-    		// Set an EditText view to get user input 
-    		final EditText input = new EditText(this);
-    		alert.setView(input);
-
-    		alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-    		public void onClick(DialogInterface dialog, int whichButton) {
-    			String value = input.getText().toString();
-    			if(value != "") {
-    				SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
-    	    		Editor spEditor = sp.edit();
-    				spEditor.putString(Ref.USERNAME_KEY, value);
-    		  		spEditor.commit();
-    			}
-    		  }
-    		});
-
-    		alert.setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
-    		  public void onClick(DialogInterface dialog, int whichButton) {
-    		    dialog.cancel();
-    		  }
-    		});
-
-    		alert.show();
-    		//end what we should functionize
-    		
+			break;
+		case R.id.change_name:
+			Ref.changeName(this, false);
 			launch = false;
+			break;
 		}
 		
 		if(launch) {
