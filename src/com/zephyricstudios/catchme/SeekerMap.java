@@ -42,8 +42,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	MapView mapView;                              // declaring these variables here (but not initializing them!)
 	MyLocationOverlay myLocationOverlay;          // allows them to be referenced in multiple methods
 	List<Overlay> mapOverlays;
-	MapsItemizedOverlay itemizedoverlay;
-	Drawable drawable;
+	MapsItemizedOverlay itemizedOverlay, newestOverlay;
 	int markerCounter;
 	int timerInterval;
 	int secondCounter;
@@ -64,10 +63,12 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_seeker_map);
 		mapView = (MapView) findViewById(R.id.mapview_seeker);
-		mapView.setBuiltInZoomControls(true); 
+		mapView.setBuiltInZoomControls(false); 
 		myLocationOverlay = new MyLocationOverlay(this, mapView);
-		drawable = this.getResources().getDrawable(R.drawable.map_marker);
-        itemizedoverlay = new MapsItemizedOverlay(drawable, this);
+        itemizedOverlay = new MapsItemizedOverlay(
+        		this.getResources().getDrawable(R.drawable.map_marker_grey), this);
+        newestOverlay = new MapsItemizedOverlay(
+        		this.getResources().getDrawable(R.drawable.map_marker), this);
 		mapOverlays = mapView.getOverlays();
         mapOverlays.add(myLocationOverlay);
         markerCounter = 0;
@@ -111,8 +112,8 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 				        	}else if(currentMessage.getDisplayMessageBody().contains(Ref.GEOPOINT)){
 				        		String geoStringTemp = currentMessage.getDisplayMessageBody().replace(Ref.GEOPOINT, "");
 				        		GeoPoint geoPointTemp = Ref.stringToGeoPoint(geoStringTemp); 	//add textview to display								
-				        		addMarker(geoPointTemp);
 				        		
+				        		addMarker(geoPointTemp);
 				        		resetCounter(); //Reset the timer
 				        		
 				        		this.abortBroadcast();
@@ -197,12 +198,17 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	 }
 	
 	public void addMarker(GeoPoint geoPointTemp){
+		
+		if(markerCounter != 0) {
+			itemizedOverlay.addOverlay(newestOverlay.getItem(0));
+		}
 		markerCounter++;
-		//mapView.setBuiltInZoomControls(true); 
-		itemizedoverlay.addOverlay(new OverlayItem(geoPointTemp, "Point " + markerCounter, null));
+		newestOverlay.clear();
+		newestOverlay.addOverlay(new OverlayItem(geoPointTemp, "Point " + markerCounter, null));
 		mapOverlays.clear();
 		mapOverlays.add(myLocationOverlay);
-		mapOverlays.add(itemizedoverlay);
+		mapOverlays.add(itemizedOverlay);
+		mapOverlays.add(newestOverlay);
 		mapView.postInvalidate();
 	}
 	

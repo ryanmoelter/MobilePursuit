@@ -35,6 +35,11 @@ public class MapsItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 	    mOverlays.add(overlayItem);
 	    populate();
 	}
+	
+	public void clear() {
+		mOverlays.clear();
+		//populate();
+	}
 
 	/**
 	 * @param args
