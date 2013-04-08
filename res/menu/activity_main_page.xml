@@ -3,4 +3,5 @@
         android:title="@string/menu_change_name"
         android:orderInCategory="100"
         android:showAsAction="never" />
+    <item android:id="@+id/menu_seeker_map" android:title="@string/menu_seeker_map"></item>
 </menu>

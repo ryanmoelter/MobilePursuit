@@ -9,6 +9,7 @@ import com.zephyricstudios.catchme.MapsItemizedOverlay;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
+import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
@@ -26,6 +27,7 @@ import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -39,13 +41,13 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	
 	ArrayList<GeoPoint> geoPoints = new ArrayList<GeoPoint>(); // used to dynamically store geopoints
 	
-	MapView mapView;                              // declaring these variables here (but not initializing them!)
-	MyLocationOverlay myLocationOverlay;          // allows them to be referenced in multiple methods
+	MapView mapView;
+	MapController mapController;
+	MyLocationOverlay myLocationOverlay;
 	List<Overlay> mapOverlays;
 	MapsItemizedOverlay itemizedOverlay, newestOverlay;
-	int markerCounter;
-	int timerInterval;
-	int secondCounter;
+	int markerCounter, timerInterval, secondCounter;
+	boolean findMe;
 	Timer timer;
 	
 	SmsManager sm = SmsManager.getDefault();
@@ -71,9 +73,15 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         		this.getResources().getDrawable(R.drawable.map_marker), this);
 		mapOverlays = mapView.getOverlays();
         mapOverlays.add(myLocationOverlay);
+		mapController = mapView.getController();
+		//mapController.setZoom(20);
+		//mapController.animateTo(myLocationOverlay.getMyLocation());
         markerCounter = 0;
         seekerTimer = (TextView)findViewById(R.id.seeker_timer);
         mapView.postInvalidate();
+        
+        findMe = true;
+        
         timer = new Timer();
         timer.schedule(new SeekerTimerTask(), 0, 1000);
         
@@ -134,7 +142,37 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
-
+        
+        //startupCenterOnCurrent();
+	}
+	
+	public void startupCenterOnCurrent() {
+		while(true) {
+			if(myLocationOverlay.getMyLocation() != null) {
+				mapController.animateTo(myLocationOverlay.getMyLocation());
+			}
+		}
+	}
+	
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_seeker_map, menu);
+        return true;
+    }
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	    case R.id.menu_find_me:
+	    	centerOnCurrent();
+	    	return true;
+	    case R.id.menu_find_runner:
+	    	centerOnRunner();
+	    	return true;
+	    default:
+	        return super.onOptionsItemSelected(item);
+	    }
 	}
 	
 	@Override
@@ -198,16 +236,16 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	 }
 	
 	public void addMarker(GeoPoint geoPointTemp){
-		
+		mapOverlays.clear();
 		if(markerCounter != 0) {
 			itemizedOverlay.addOverlay(newestOverlay.getItem(0));
+			mapOverlays.add(itemizedOverlay); // This is in here because the phone has issues moving the map with
+			                                  // a blank overlay on it.
 		}
 		markerCounter++;
 		newestOverlay.clear();
 		newestOverlay.addOverlay(new OverlayItem(geoPointTemp, "Point " + markerCounter, null));
-		mapOverlays.clear();
 		mapOverlays.add(myLocationOverlay);
-		mapOverlays.add(itemizedOverlay);
 		mapOverlays.add(newestOverlay);
 		mapView.postInvalidate();
 	}
@@ -238,6 +276,33 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	
 	public void sendImOut() {
 		sm.sendTextMessage(snitchNumber, null, Ref.IM_OUT, null, null);
+	}
+	
+	public void centerOnCurrent() {
+		if(myLocationOverlay.getMyLocation() != null) {
+			mapController.animateTo(myLocationOverlay.getMyLocation());
+		} else {
+			Toast toast = Toast.makeText(this, "Your location could not be found", Toast.LENGTH_SHORT);
+			toast.show();
+		}
+	}
+	
+	public void centerOnRunner() {
+		if(markerCounter != 0) {
+			mapController.animateTo(newestOverlay.getItem(0).getPoint());
+		} else {
+			Toast toast = Toast.makeText(this, "The runner has not sent their location yet", Toast.LENGTH_SHORT);
+			toast.show();
+		}
+	}
+	
+	public void onTimeClick(View v) {
+		if(findMe) {
+			centerOnCurrent();
+		} else {
+			centerOnRunner();
+		}
+		findMe = !findMe;
 	}
 }
 

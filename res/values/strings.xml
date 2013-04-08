@@ -8,6 +8,8 @@
     <string name="menu_seeker_map">Seeker Map</string>
     <string name="menu_snitch">Runner</string>
     <string name="menu_change_name">Change Name</string>
+    <string name="menu_find_me">Find Me</string>
+    <string name="menu_find_runner">Find the Runner</string>
 
     <!-- Activity Titles -->
     <string name="title_activity_main_page">Catch Me</string>

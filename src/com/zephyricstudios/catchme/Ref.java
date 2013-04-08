@@ -35,6 +35,7 @@ public class Ref {
 	//Texting codes
 	static final String IM_IN =".I'm in. ";
 	static final String IM_OUT = ".I'm out";
+	static final String YOURE_OUT = ".You're out";
 	static final String GEOPOINT = ".gp: ";
 	static final String GAME_START = ".Start game. ";
 	static final String GAME_OVER = ".Game over";

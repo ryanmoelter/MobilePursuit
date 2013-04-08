@@ -19,6 +19,10 @@ public class Seeker implements Parcelable {
 		adapter.notifyDataSetChanged();
 	}
 	
+	public static void createSeeker(String number, String name, ArrayList<Seeker> array) {
+		array.add(new Seeker(number, name));
+	}
+	
 	public static void deleteSeeker(int index, ArrayList<Seeker> array, SeekerAdapter adapter) {
 		array.remove(index);
 		adapter.notifyDataSetChanged();

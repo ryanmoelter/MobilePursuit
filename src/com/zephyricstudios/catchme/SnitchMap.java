@@ -1,4 +1,4 @@
-package com.zephyricstudios.catchme;
+ package com.zephyricstudios.catchme;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,7 @@ import com.zephyricstudios.catchme.MapsItemizedOverlay;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
+import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
@@ -25,6 +26,7 @@ import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
@@ -37,8 +39,9 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	
 	ArrayList<GeoPoint> geoPoints = new ArrayList<GeoPoint>(); // used to dynamically store geopoints
 	
-	MapView mapView;                              // declaring these variables here (but not initializing them!)
-	MyLocationOverlay myLocationOverlay;          // allows them to be referenced in multiple methods
+	MapView mapView;
+	MapController mapController;
+	MyLocationOverlay myLocationOverlay;
 	List<Overlay> mapOverlays;
 	MapsItemizedOverlay itemizedoverlay;
 	Drawable drawable;
@@ -50,18 +53,25 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	int secondCounter;
 	RelativeLayout buttonSnitchTagged;
 	
+	boolean mapExpanded;
+	
 	// Typeface
 	Typeface thin, light;
 	TextView textTagged;
 	
 	BroadcastReceiver localTextReceiver;
 	IntentFilter filter;
+	
+	//Texting
+	String textContent;
+	Thread sendTexts;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_snitch_map);
 		extractMapView();
+		mapController = mapView.getController();
 		myLocationOverlay = new MyLocationOverlay(this, mapView);
 		mapOverlays = mapView.getOverlays();
         mapOverlays.add(myLocationOverlay);
@@ -74,6 +84,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         Ref.activityState = Ref.SNITCHMAP;
         buttonSnitchTagged = (RelativeLayout)findViewById(R.id.button_snitch_tagged);
         buttonSnitchTagged.setOnClickListener(this);
+        mapExpanded = false;
         
         // Typeface
         thin = Typeface.createFromAsset(getAssets(), "roboto_thin.ttf");
@@ -83,43 +94,68 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         textTagged.setTypeface(light);
         
         localTextReceiver = new BroadcastReceiver(){
-
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				Bundle bundle = intent.getExtras();
 
 				if (bundle != null) {
-				        Object[] pdusObj = (Object[]) bundle.get("pdus");
-				        SmsMessage[] messages = new SmsMessage[pdusObj.length];
-				        
-				        // getting SMS information from Pdu.
-				        for (int i = 0; i < pdusObj.length; i++) {
-				                messages[i] = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
-				        }
+				    Object[] pdusObj = (Object[]) bundle.get("pdus");
+				    SmsMessage[] messages = new SmsMessage[pdusObj.length];
+				    
+				    // getting SMS information from Pdu.
+				    for(int i = 0; i < pdusObj.length; i++) {
+				        messages[i] = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
+				    }
 
-				        for (SmsMessage currentMessage : messages) {
-				        	if(currentMessage.getDisplayMessageBody().contains(Ref.IM_OUT)){
-				        		//Context cont = getApplicationContext();
-				    			CharSequence text = (Seeker.getSeekerNameByNum(currentMessage.getDisplayOriginatingAddress(), seekerArray) + " has left the game.");
-				    			int duration = Toast.LENGTH_SHORT;
-				    			Toast toast = Toast.makeText(context, text, duration);
-				    			toast.show();
-				        		Seeker.deleteSeekerByNum(currentMessage.getDisplayOriginatingAddress(), seekerArray);
-				        		this.abortBroadcast();
-				        	}
-				               //currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
-				               //currentMessage.getDisplayMessageBody();				// has the actual message
+				    for (SmsMessage currentMessage : messages) {
+				    	if(currentMessage.getDisplayMessageBody().contains(Ref.IM_OUT)){
+				    		//Context cont = getApplicationContext();
+				    		Seeker.deleteSeekerByNum(currentMessage.getDisplayOriginatingAddress(),
+				    				seekerArray);
+				    		CharSequence text = (Seeker.getSeekerNameByNum(
+				    				currentMessage.getDisplayOriginatingAddress(), seekerArray)
+				    				+ " has left the game.");
+				    		Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+				    		toast.show();
+				        	this.abortBroadcast();
 				        }
+				           //currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
+				           //currentMessage.getDisplayMessageBody();			// has the actual message
+				    }
 				}
-				
 			}
-        	
         };
         
         filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
         
+        sendTexts = new Thread() {
+        	public void run() {
+        		for(int index = 0; seekerArray.size() > index; index++) {
+    				sm.sendTextMessage(seekerArray.get(index).getNumber(), null, textContent, null, null);
+    			}
+        	}
+        };
+        
+	}
+	
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_snitch_map, menu);
+        return true;
+    }
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	    case R.id.menu_find_me:
+	    	centerOnMe();
+	    	return true;
+	    default:
+	        return super.onOptionsItemSelected(item);
+	    }
 	}
 	
 	@Override
@@ -127,6 +163,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 		super.onPause();
 		// when our activity pauses, we want to remove listening for location updates
     	//myLocationOverlay.disableMyLocation();
+		//this.unregisterReceiver(this.localTextReceiver);
 	}
 	
 	@Override
@@ -134,6 +171,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 		super.onStop();
 		myLocationOverlay.disableMyLocation();
 		this.unregisterReceiver(this.localTextReceiver);
+		timer.cancel();
 	}
 	
 	@Override
@@ -151,11 +189,12 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 
 	public void onClick(View buttonClicked) {
 		if(buttonClicked == buttonSnitchTagged){
-			for(int j =0;j<seekerArray.size();j++){
+			textContent = Ref.GAME_OVER;
+			sendTexts.start();
+			
+			/*for(int j =0; j<seekerArray.size(); j++){
 				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, Ref.GAME_OVER, null, null);
-			}
-			myLocationOverlay.disableMyLocation();
-			timer.cancel();
+			}*/
 			Intent i = new Intent(this, GameOverPage.class);
 			startActivity(i);
 			finish();
@@ -180,8 +219,8 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	            	  for(int j =0;j<seekerArray.size();j++){
 	      				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, Ref.GAME_OVER, null, null);
 	            	  }
-	            	  myLocationOverlay.disableMyLocation();
-	            	  timer.cancel();
+	            	  //myLocationOverlay.disableMyLocation();
+	            	  //timer.cancel();
 	                  finish();
 	                return;
 	            } }); 
@@ -206,12 +245,15 @@ public class SnitchMap extends MapActivity implements OnClickListener {
                 public void run() {
                 	if(secondCounter >= timerInterval){
                 		//put in texting
-                		if(seekerArray != null) {
+                		textContent = Ref.GEOPOINT + String.valueOf(myLocationOverlay.getMyLocation());
+                		sendTexts.start();
+                		
+                		/*if(seekerArray != null) {
                 			for(int j = 0 ; j < seekerArray.size(); j++){
                 				String textContent = Ref.GEOPOINT + String.valueOf(myLocationOverlay.getMyLocation());
                 				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, textContent, null, null);
                 			}
-                		}
+                		}*/
                 		
                 		secondCounter = 0;
                 	}
@@ -223,6 +265,38 @@ public class SnitchMap extends MapActivity implements OnClickListener {
                 }
             });
         }
-   }
+	}
+	
+	public void centerOnMe() {
+		if(myLocationOverlay.getMyLocation() != null) {
+			mapController.animateTo(myLocationOverlay.getMyLocation());
+		} else {
+			Toast toast = Toast.makeText(this, "Your location could not be found", Toast.LENGTH_SHORT);
+			toast.show();
+		}
+	}
+	
+	public void onTimeClick(View v) {
+		centerOnMe();
+	}
+	
+	public void expandMap() {
+		//Toast toast = Toast.makeText(this, "Expanded!", Toast.LENGTH_SHORT);
+		//toast.show();
+	}
+	
+	public void compressMap() {
+		//Toast toast = Toast.makeText(this, "Collapsed!", Toast.LENGTH_SHORT);
+		//toast.show();
+	}
+	
+	public void onMapClick(View v) {
+		if(mapExpanded) {
+			expandMap();
+		} else {
+			compressMap();
+		}
+		mapExpanded = !mapExpanded;
+	}
 
 }
