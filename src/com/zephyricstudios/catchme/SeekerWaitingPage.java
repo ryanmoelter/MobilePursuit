@@ -81,6 +81,9 @@ public class SeekerWaitingPage extends Activity {
 				        			this.abortBroadcast();
 				        			context.startActivity(i);
 				        			finish();
+				        		} else if(currentMessage.getDisplayMessageBody().contains(Ref.YOURE_OUT)) {
+				        			this.abortBroadcast();
+				        			youreOut();
 				        		}
 				        //	}
 				        	
@@ -143,6 +146,21 @@ public class SeekerWaitingPage extends Activity {
 	        return true;
 	    }
 		return super.onKeyDown(keyCode, event);
+	}
+	
+	public void youreOut() {
+		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle("You're out");
+        alertDialog.setIcon(R.drawable.ic_launcher);
+
+        alertDialog.setMessage("The runner has kicked you out of the game.");
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Okay", new DialogInterface.OnClickListener() {
+        	public void onClick(DialogInterface dialog, int which) {
+                finish();
+                return;
+            }
+        });
+        alertDialog.show();
 	}
 	
 	public void sendImOut() {

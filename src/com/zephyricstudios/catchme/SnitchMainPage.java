@@ -198,6 +198,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     	
     	case R.id.item_delete:
     		int position = (int)Integer.valueOf((String)v.getTag());
+    		sm.sendTextMessage(seekerArray.get(position).getNumber(), null, Ref.YOURE_OUT, null, null);
     		Seeker.deleteSeeker(position, seekerArray, adapter);
     		break;
     	
