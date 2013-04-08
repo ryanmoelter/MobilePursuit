@@ -64,7 +64,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	
 	//Texting
 	String textContent;
-	Thread sendTexts;
+	//Thread sendTexts;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +117,9 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 				    				+ " has left the game.");
 				    		Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
 				    		toast.show();
+				    		
 				        	this.abortBroadcast();
+				        	SnitchMap.this.checkSeekerArrayEmpty();
 				        }
 				           //currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
 				           //currentMessage.getDisplayMessageBody();			// has the actual message
@@ -130,14 +132,46 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
         
-        sendTexts = new Thread() {
+        /*sendTexts = new Thread() {
         	public void run() {
         		for(int index = 0; seekerArray.size() > index; index++) {
     				sm.sendTextMessage(seekerArray.get(index).getNumber(), null, textContent, null, null);
+    				
     			}
         	}
-        };
+        };*/
         
+	}
+	
+	public void checkSeekerArrayEmpty() {
+		if(seekerArray.isEmpty()) {
+			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+	        alertDialog.setTitle("Game over");
+	        alertDialog.setIcon(R.drawable.ic_launcher);
+
+	        alertDialog.setMessage("The seekers have all left the game.");
+	        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Okay", new DialogInterface.OnClickListener() {
+	        	public void onClick(DialogInterface dialog, int which) {
+	        		finish();
+	        		return;
+	        	}
+	        });
+	        alertDialog.show();
+		}
+	}
+	
+	public void sendTexts() {
+		// This might be making it stop sending texts a little in to the game.
+		/*new Thread(new Runnable() {
+			public void run() {
+				for(int index = 0; seekerArray.size() > index; index++) {
+    				sm.sendTextMessage(seekerArray.get(index).getNumber(), null, textContent, null, null);
+    			}
+			}
+		}).start(); */
+		for(int index = 0; seekerArray.size() > index; index++) {
+			sm.sendTextMessage(seekerArray.get(index).getNumber(), null, textContent, null, null);
+		}
 	}
 	
 	@Override
@@ -179,7 +213,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 		super.onResume();
 		// when our activity resumes, we want to register for location updates
     	myLocationOverlay.enableMyLocation();
-    	Ref.activityState = Ref.SNITCHMAP;
+    	//Ref.activityState = Ref.SNITCHMAP;
 	}
 
 	@Override
@@ -188,16 +222,21 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	}
 
 	public void onClick(View buttonClicked) {
-		if(buttonClicked == buttonSnitchTagged){
-			textContent = Ref.GAME_OVER;
-			sendTexts.start();
-			
-			/*for(int j =0; j<seekerArray.size(); j++){
-				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, Ref.GAME_OVER, null, null);
-			}*/
-			Intent i = new Intent(this, GameOverPage.class);
-			startActivity(i);
-			finish();
+		switch(buttonClicked.getId()) {
+		case R.id.button_snitch_tagged:
+			showEndGameAlert();
+			break;
+		case R.id.seeker_timer:
+			centerOnMe();
+			break;
+		case R.id.mapview:
+			if(mapExpanded) {
+				expandMap();
+			} else {
+				compressMap();
+			}
+			mapExpanded = !mapExpanded;
+			break;
 		}
 	}
 	
@@ -207,31 +246,11 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	}
 	
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	     if (keyCode == KeyEvent.KEYCODE_BACK) {
+		if(keyCode == KeyEvent.KEYCODE_BACK) {
 
-	         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-	            alertDialog.setTitle("Exit Game?");
-	            alertDialog.setIcon(R.drawable.ic_launcher);
+			showEndGameAlert();
 
-	            alertDialog.setMessage("Do you really want to go back? This will remove you from the game!");
-	            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
-	              public void onClick(DialogInterface dialog, int which) {
-	            	  for(int j =0;j<seekerArray.size();j++){
-	      				sm.sendTextMessage(seekerArray.get(j).getNumber(), null, Ref.GAME_OVER, null, null);
-	            	  }
-	            	  //myLocationOverlay.disableMyLocation();
-	            	  //timer.cancel();
-	                  finish();
-	                return;
-	            } }); 
-	            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
-	              public void onClick(DialogInterface dialog, int which) {
-	                  dialog.cancel();
-	                return;
-	            }}); 
-	              alertDialog.show();
-
-	         return true;
+	        return true;
 	     }
 	     return super.onKeyDown(keyCode, event);
 	 }
@@ -246,7 +265,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
                 	if(secondCounter >= timerInterval){
                 		//put in texting
                 		textContent = Ref.GEOPOINT + String.valueOf(myLocationOverlay.getMyLocation());
-                		sendTexts.start();
+                		sendTexts();
                 		
                 		/*if(seekerArray != null) {
                 			for(int j = 0 ; j < seekerArray.size(); j++){
@@ -267,6 +286,42 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         }
 	}
 	
+	public void endGame() {
+		Intent i = new Intent(this, GameOverPage.class);
+		startActivity(i);
+		finish();
+	}
+	
+	public void showEndGameAlert() {
+		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle("End game?");
+        alertDialog.setIcon(R.drawable.ic_launcher);
+
+        alertDialog.setMessage("Do you want to end the game?");
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
+        	public void onClick(DialogInterface dialog, int which) {
+        		textContent = Ref.GAME_OVER;
+        		sendTexts();
+        		
+        		/*for(int j = 0; j < seekerArray.size(); j++) {
+        			sm.sendTextMessage(seekerArray.get(j).getNumber(), null, Ref.GAME_OVER, null, null);
+        		}*/
+        		//myLocationOverlay.disableMyLocation();
+        		//timer.cancel();
+        		
+        		endGame();
+        		return;
+        	}
+        }); 
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
+        	public void onClick(DialogInterface dialog, int which) {
+        		dialog.cancel();
+        		return;
+            }
+        }); 
+        alertDialog.show();
+	}
+	
 	public void centerOnMe() {
 		if(myLocationOverlay.getMyLocation() != null) {
 			mapController.animateTo(myLocationOverlay.getMyLocation());
@@ -276,27 +331,14 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 		}
 	}
 	
-	public void onTimeClick(View v) {
-		centerOnMe();
-	}
-	
 	public void expandMap() {
-		//Toast toast = Toast.makeText(this, "Expanded!", Toast.LENGTH_SHORT);
-		//toast.show();
+		Toast toast = Toast.makeText(this, "Expanded!", Toast.LENGTH_SHORT);
+		toast.show();
 	}
 	
 	public void compressMap() {
-		//Toast toast = Toast.makeText(this, "Collapsed!", Toast.LENGTH_SHORT);
-		//toast.show();
-	}
-	
-	public void onMapClick(View v) {
-		if(mapExpanded) {
-			expandMap();
-		} else {
-			compressMap();
-		}
-		mapExpanded = !mapExpanded;
+		Toast toast = Toast.makeText(this, "Collapsed!", Toast.LENGTH_SHORT);
+		toast.show();
 	}
 
 }

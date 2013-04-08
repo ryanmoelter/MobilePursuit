@@ -127,7 +127,10 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 				        				currentMessage.getDisplayMessageBody().replace(Ref.IM_IN, ""),
 				        				seekerArray, adapter);
 				        		this.abortBroadcast();
-				       		} 
+				       		} else if(currentMessage.getDisplayMessageBody().contains(Ref.IM_OUT)) {
+				       			Seeker.deleteSeekerByNum(currentMessage.getDisplayOriginatingAddress(), seekerArray);
+				       			this.abortBroadcast();
+				       		}
 				        	//currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
 				        	//currentMessage.getDisplayMessageBody();				// has the actual message
 				        }

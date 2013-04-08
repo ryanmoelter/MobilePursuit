@@ -20,18 +20,17 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="135sp"
             android:gravity="bottom"
-            android:layout_weight="4"
-            android:onClick="onTimeClick" />
+            android:layout_weight="3"
+            android:clickable="true" />
 
         <com.google.android.maps.MapView
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/mapview"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_weight="3"
+            android:layout_weight="4"
             android:apiKey="0QAi9lFxlS2caS6sAqnBsCcW4Z38uZCIC1bd5Dw"
-            android:clickable="true"
-            android:onClick="onMapClick" />
+            android:clickable="true" />
 
     </LinearLayout>
 

@@ -2,12 +2,16 @@ package com.zephyricstudios.catchme;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Typeface;
+import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -29,6 +33,8 @@ public class SeekerWaitingPage extends Activity {
 	
 	BroadcastReceiver localTextReceiver;
 	IntentFilter filter;
+	
+	SmsManager sm;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +46,8 @@ public class SeekerWaitingPage extends Activity {
 		waitingForSnitch.setTypeface(light);
 		
 		snitchNumber = this.getIntent().getExtras().getString(Ref.SNITCH_NUMBER_KEY);
+		
+		sm = SmsManager.getDefault();
 		
 		//CmiycJavaRes.activityState = CmiycJavaRes.SEEKERWAITING;
 		localTextReceiver = new BroadcastReceiver(){
@@ -107,6 +115,38 @@ public class SeekerWaitingPage extends Activity {
 	public void onStop() {
 		super.onStop();
 		this.unregisterReceiver(this.localTextReceiver);
+	}
+	
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+	        alertDialog.setTitle("Leave Game?");
+	        alertDialog.setIcon(R.drawable.ic_launcher);
+
+	        alertDialog.setMessage("Do you want to leave the game?");
+	        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
+	        	public void onClick(DialogInterface dialog, int which) {
+	        		sendImOut();
+	                finish();
+	                return;
+	            }
+	        }); 
+	        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
+	        	public void onClick(DialogInterface dialog, int which) {
+	        		dialog.cancel();
+	        		return;
+	        	}
+	        }); 
+	        alertDialog.show();
+
+	        return true;
+	    }
+		return super.onKeyDown(keyCode, event);
+	}
+	
+	public void sendImOut() {
+		sm.sendTextMessage(snitchNumber, null, Ref.IM_OUT, null, null);
 	}
 
 }

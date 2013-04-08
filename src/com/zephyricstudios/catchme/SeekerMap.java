@@ -50,7 +50,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	boolean findMe;
 	Timer timer;
 	
-	SmsManager sm = SmsManager.getDefault();
+	SmsManager sm;
 	BroadcastReceiver localTextReceiver;
 	IntentFilter filter;
 	
@@ -94,6 +94,9 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         timerInterval = this.getIntent().getExtras().getInt(Ref.TIMER_INTERVAL_KEY);
         snitchNumber = this.getIntent().getExtras().getString(Ref.SNITCH_NUMBER_KEY);
         secondCounter = 0;
+        
+        sm = SmsManager.getDefault();
+        
         localTextReceiver = new BroadcastReceiver(){
 
 			@Override
@@ -147,11 +150,24 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	}
 	
 	public void startupCenterOnCurrent() {
-		while(true) {
-			if(myLocationOverlay.getMyLocation() != null) {
-				mapController.animateTo(myLocationOverlay.getMyLocation());
+		// I couldn't get this to work...
+		/*new Thread(new Runnable() {
+			public void run() {
+				while(myLocationOverlay.getMyLocation() == null) {
+					/*try {
+						this.wait(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}* /
+				}
+				SeekerMap.this.runOnUiThread(new Runnable {
+					public void run() {
+						centerOnCurrent();
+					}
+				});				
 			}
-		}
+		}).start(); */
 	}
 	
 	@Override
@@ -185,6 +201,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	
 	@Override
 	protected void onStop(){
+		sendImOut();
 		super.onStop();
 		this.unregisterReceiver(this.localTextReceiver);
 	}
@@ -210,27 +227,30 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	}
 	
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	     if (keyCode == KeyEvent.KEYCODE_BACK) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
 
-	         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-	            alertDialog.setTitle("Exit Game?");
-	            alertDialog.setIcon(R.drawable.ic_launcher);
+			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+	        alertDialog.setTitle("Leave Game?");
+	        alertDialog.setIcon(R.drawable.ic_launcher);
 
-	            alertDialog.setMessage("Do you really want to go back? This will remove you from the game!");
-	            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
-	              public void onClick(DialogInterface dialog, int which) {
-	            	  sendImOut();
-	                  finish();
+	        alertDialog.setMessage("Do you want to leave the game?");
+	        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
+	        	public void onClick(DialogInterface dialog, int which) {
+	        		// moved to onStop()
+	        		//sendImOut();
+	                finish();
 	                return;
-	            } }); 
-	            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
-	              public void onClick(DialogInterface dialog, int which) {
-	                  dialog.cancel();
-	                return;
-	            }}); 
-	              alertDialog.show();
+	            }
+	        }); 
+	        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
+	        	public void onClick(DialogInterface dialog, int which) {
+	        		dialog.cancel();
+	        		return;
+	        	}
+	        }); 
+	        alertDialog.show();
 
-	         return true;
+	        return true;
 	     }
 	     return super.onKeyDown(keyCode, event);
 	 }
