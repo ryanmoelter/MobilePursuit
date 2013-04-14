@@ -109,9 +109,6 @@ public class SeekerWaitingPage extends Activity {
 	@Override
     public void onResume(){
     	super.onResume();
-    	this.registerReceiver(this.localTextReceiver, filter);
-    	Ref.activityState = Ref.SEEKERWAITING;
-    	
     }
 	
 	@Override

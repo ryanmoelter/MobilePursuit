@@ -90,13 +90,6 @@ public class SeekerMainPage extends Activity implements OnClickListener{
 	        return super.onOptionsItemSelected(item);
 	    }
 	}
-    
-    @Override
-    public void onResume(){
-    	super.onResume();
-    	Ref.activityState = Ref.SEEKERMAIN;
-    	
-    }
    
     @Override  
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {  

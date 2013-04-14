@@ -81,7 +81,6 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         timerInterval = this.getIntent().getExtras().getInt(Ref.TIMER_INTERVAL_KEY);
         timer = new Timer();
         timer.schedule(new SnitchTimerTask(), 0, 1000);
-        Ref.activityState = Ref.SNITCHMAP;
         buttonSnitchTagged = (RelativeLayout)findViewById(R.id.button_snitch_tagged);
         buttonSnitchTagged.setOnClickListener(this);
         mapExpanded = false;
@@ -179,6 +178,12 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 			public void run() {
 				for(int index = 0; seekerArray.size() > index; index++) {
     				sm.sendTextMessage(seekerArray.get(index).getNumber(), null, textContent, null, null);
+    				try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
     			}
 			}
 		}).start();

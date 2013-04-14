@@ -90,8 +90,6 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         thin = Typeface.createFromAsset(getAssets(), "roboto_thin.ttf");
         seekerTimer.setTypeface(thin);
         
-        Ref.activityState = Ref.SEEKERMAP;
-        
         timerInterval = this.getIntent().getExtras().getInt(Ref.TIMER_INTERVAL_KEY);
         snitchNumber = this.getIntent().getExtras().getString(Ref.SNITCH_NUMBER_KEY);
         secondCounter = 0;

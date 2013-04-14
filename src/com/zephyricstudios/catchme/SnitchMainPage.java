@@ -103,8 +103,6 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         
         timerInterval = 30;
         
-        Ref.activityState = Ref.SNITCHMAIN;
-        
         localTextReceiver = new BroadcastReceiver(){
 
 			@Override
@@ -113,27 +111,27 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 				Bundle bundle = intent.getExtras();
 
 				if (bundle != null) {
-				        Object[] pdusObj = (Object[]) bundle.get("pdus");
-				        SmsMessage[] messages = new SmsMessage[pdusObj.length];
-				        
-				        // getting SMS information from Pdu.
-				        for (int i = 0; i < pdusObj.length; i++) {
-				                messages[i] = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
-				        }
+					Object[] pdusObj = (Object[]) bundle.get("pdus");
+				    SmsMessage[] messages = new SmsMessage[pdusObj.length];
+				    
+				    // getting SMS information from Pdu.
+				    for (int i = 0; i < pdusObj.length; i++) {
+				        messages[i] = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
+				    }
 
-				        for (SmsMessage currentMessage : messages) {
-				        	if(currentMessage.getDisplayMessageBody().contains(Ref.IM_IN)){ 
-				        		Seeker.createSeeker(currentMessage.getDisplayOriginatingAddress(),
-				        				currentMessage.getDisplayMessageBody().replace(Ref.IM_IN, ""),
-				        				seekerArray, adapter);
-				        		this.abortBroadcast();
-				       		} else if(currentMessage.getDisplayMessageBody().contains(Ref.IM_OUT)) {
-				       			Seeker.deleteSeekerByNum(currentMessage.getDisplayOriginatingAddress(), seekerArray);
-				       			this.abortBroadcast();
-				       		}
-				        	//currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
-				        	//currentMessage.getDisplayMessageBody();				// has the actual message
-				        }
+				    for (SmsMessage currentMessage : messages) {
+				    	if(currentMessage.getDisplayMessageBody().contains(Ref.IM_IN)){ 
+				    		Seeker.createSeeker(currentMessage.getDisplayOriginatingAddress(),
+				    				currentMessage.getDisplayMessageBody().replace(Ref.IM_IN, ""),
+				    				seekerArray, adapter);
+				    		this.abortBroadcast();
+				    	} else if(currentMessage.getDisplayMessageBody().contains(Ref.IM_OUT)) {
+				    		Seeker.deleteSeekerByNum(currentMessage.getDisplayOriginatingAddress(), seekerArray);
+				    		this.abortBroadcast();
+				    	}
+				        //currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
+				        //currentMessage.getDisplayMessageBody();				// has the actual message
+				    }
 				}
 				
 			}
@@ -147,6 +145,12 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         	public void run() {
         		for(int index = 0; seekerArray.size() > index; index++) {
     				sm.sendTextMessage(seekerArray.get(index).getNumber(), null, textContent, null, null);
+    				try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
     			}
         	}
         };
@@ -154,22 +158,9 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     }
     
     @Override
-    public void onPause(){
-    	super.onPause();
-    	//this.unregisterReceiver(this.localTextReceiver);
-    }
-    
-    @Override
     protected void onDestroy() {
     	this.unregisterReceiver(this.localTextReceiver);
     	super.onDestroy();
-    }
-    
-    @Override
-    public void onResume(){
-    	super.onResume();
-    	Ref.activityState = Ref.SNITCHMAIN;
-    	this.registerReceiver(this.localTextReceiver, filter);
     }
     
     public void onClick(View v){
@@ -183,14 +174,13 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     			sendingLayout.setVisibility(View.VISIBLE);
     			
     			sendTexts.start();
+    			/*try {
+					wait(seekerArray.size() * 500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}*/
     			
-    			/*for(int index = 0; seekerArray.size() > index; index++) {
-    				sm.sendTextMessage(seekerArray.get(index).getNumber(), null, textContent, null, null);
-    			} */
-    			
-    			//CmiycJavaRes.activityState = CmiycJavaRes.SNITCHMAP;
-    			//i.putStringArrayListExtra(CmiycJavaRes.SEEKER_NUMBERS_KEY, seekerNumbers);
-    			//i.putStringArrayListExtra(CmiycJavaRes.SEEKER_NAMES_KEY, seekerNames);
     			i.putParcelableArrayListExtra(Ref.SEEKER_ARRAY_KEY, seekerArray);
     			i.putExtra(Ref.TIMER_INTERVAL_KEY, timerInterval);
     			this.startActivity(i);

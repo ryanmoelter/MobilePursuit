@@ -59,8 +59,6 @@ public class MainPage extends Activity implements OnClickListener {
     	textMainSnitch.setTypeface(light);
     	textMainConfused.setTypeface(light);
     	
-    	Ref.activityState = Ref.MAIN;
-    	
     	SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
     	//Editor spEditor = sp.edit();  //use these two lines anywhere I want to use/edit shared prefs
     	

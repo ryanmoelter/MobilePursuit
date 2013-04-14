@@ -66,7 +66,8 @@
             android:hint="@string/enter_number"
             android:inputType="phone"
             android:text=""
-            android:textAppearance="?android:attr/textAppearanceLargeInverse" >
+            android:textAppearance="?android:attr/textAppearanceLargeInverse"
+            android:maxLength="13" >
 
             <!-- android:ems="10" -->
             

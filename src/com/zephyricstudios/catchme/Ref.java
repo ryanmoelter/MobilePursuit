@@ -1,11 +1,18 @@
 package com.zephyricstudios.catchme;
 
+import java.util.ArrayList;
+
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
+import android.telephony.SmsMessage;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
@@ -14,14 +21,6 @@ import android.widget.Toast;
 import com.google.android.maps.GeoPoint;
 
 public class Ref {
-	
-	static final int MAIN = 115;
-	static final int SEEKERMAIN = 215;
-	static final int SNITCHMAIN = 315;
-	static final int SEEKERWAITING = 267;
-	static final int SNITCHMAP = 354;
-	static final int SEEKERMAP = 254;
-	static final int CONFUSED = 415;
 	
 	static final int SETTINGS_PAGE_RESULT_CODE = 2045;
 	
@@ -36,14 +35,20 @@ public class Ref {
 	static final String SNITCH_NUMBER_KEY = "snitch number";
 	
 	//Texting codes
-	static final String IM_IN =".I'm in. ";
-	static final String IM_OUT = ".I'm out";
-	static final String YOURE_OUT = ".You're out";
-	static final String GEOPOINT = ".gp: ";
-	static final String GAME_START = ".Start game. ";
-	static final String GAME_OVER = ".Game over";
+	static final String CATCH_ME = ".Catch Me. ";
+	static final String IM_IN ="I'm in. ";
+	static final String IM_OUT = "I'm out";
+	static final String YOURE_IN = "You're in. ";
+	static final String YOURE_OUT = "You're out";
+	static final String HES_IN = "He's in. ";
+	static final String HES_OUT = "He's out. ";
+	static final String GEOPOINT = "gp: ";
+	static final String GAME_START = "Start game. ";
+	static final String GAME_OVER = "Game over";
 	
-	static int activityState;
+	public static ArrayList<Seeker> seekerArray;
+	public static SeekerAdapter adapter;
+	
 	
 	public static GeoPoint stringToGeoPoint(String geoString){
 		String testString = geoString.replace("-", "").replace(",", "");
@@ -76,7 +81,7 @@ public class Ref {
 		if(firstTime) {
 			alert.setMessage("Please enter your name. Don't worry; you can change it later.");
 		} else {
-			alert.setMessage("Please enter your new name.");
+			alert.setMessage("Please enter your name.");
 		}
 		
 		// Set an EditText view to get user input 
@@ -84,21 +89,21 @@ public class Ref {
 		/*input.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void afterTextChanged(Editable arg0) {
-				// TODO Auto-generated method stub
+				// TOD Auto-generated method stub
 				
 			}
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
-				// TODO Auto-generated method stub
+				// TOD Auto-generated method stub
 				
 			}
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
-				// TODO Auto-generated method stub
+				// TOD Auto-generated method stub
 				
 			}});*/
 		input.setText(sp.getString(USERNAME_KEY, ""));
@@ -131,5 +136,70 @@ public class Ref {
 		}
 
 		alert.show();
+	}
+	
+	public void joinGameAlert(String name, String number, Context context) {
+		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+		alert.setTitle("Join Game");
+		alert.setMessage(name + " wants you to join their game.");
+		
+		alert.setPositiveButton("Sure", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int button) {
+				// TODO joinGame();
+			}
+		});
+		
+		alert.setNegativeButton("No, go away", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				dialog.cancel();
+			}
+		});
+	}
+	
+	// This is experimental, I have no idea how exactly to get a global BroadcastReceiver working
+	public BroadcastReceiver createBroadcastReceiver(/*ArrayList<Seeker> seekerArray, SeekerAdapter adapter*/) {
+		return new BroadcastReceiver() {
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				// TODO Auto-generated method stub
+				Bundle bundle = intent.getExtras();
+				
+				String name, number, message;
+
+				if (bundle != null) {
+					Object[] pdusObj = (Object[]) bundle.get("pdus");
+				    SmsMessage[] messages = new SmsMessage[pdusObj.length];
+				    
+				    // getting SMS information from Pdu.
+				    for (int i = 0; i < pdusObj.length; i++) {
+				        messages[i] = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
+				    }
+
+				    for (SmsMessage currentMessage : messages) {
+				    	if(currentMessage.getDisplayMessageBody().contains(CATCH_ME)) {
+				    		number = currentMessage.getDisplayOriginatingAddress();
+				    		message = currentMessage.getDisplayMessageBody();
+				    		
+				    		if(message.contains(Ref.IM_IN)){
+				    			name = message.replace(Ref.IM_IN, "");
+					    		Seeker.createSeeker(number, name, seekerArray, adapter);
+					    		
+					    	} else if(message.contains(Ref.IM_OUT)) {
+					    		Seeker.deleteSeekerByNum(number, seekerArray);
+					    		
+					    	} else if(message.contains(YOURE_IN)) {
+					    		name = message.replace(YOURE_IN, "");
+					    		joinGameAlert(name, number, context);
+					    	}
+				    		
+				    		this.abortBroadcast();
+				    	}
+				        //currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
+				        //currentMessage.getDisplayMessageBody();				// has the actual message
+				    }
+				}
+			}
+		};
 	}
 }

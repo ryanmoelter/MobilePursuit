@@ -35,12 +35,4 @@ public class Confused extends Activity {
         
         
     }
-    
-    @Override
-    public void onResume(){
-    	super.onResume();
-    	Ref.activityState = Ref.CONFUSED;
-    	
-    }
 }
-//test push without bin
