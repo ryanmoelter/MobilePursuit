@@ -117,6 +117,11 @@ public class SeekerWaitingPage extends Activity {
 	@Override
 	public void onStop() {
 		super.onStop();
+		//this.unregisterReceiver(this.localTextReceiver);
+	}
+	
+	@Override
+	protected void onDestroy() {
 		this.unregisterReceiver(this.localTextReceiver);
 	}
 	

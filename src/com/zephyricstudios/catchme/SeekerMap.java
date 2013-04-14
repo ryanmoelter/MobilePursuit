@@ -47,7 +47,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	List<Overlay> mapOverlays;
 	MapsItemizedOverlay itemizedOverlay, newestOverlay;
 	int markerCounter, timerInterval, secondCounter;
-	boolean findMe;
+	boolean findMe, imOut;
 	Timer timer;
 	
 	SmsManager sm;
@@ -81,6 +81,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         mapView.postInvalidate();
         
         findMe = true;
+        imOut = true;
         
         timer = new Timer();
         timer.schedule(new SeekerTimerTask(), 0, 1000);
@@ -129,6 +130,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 				        		
 				        		this.abortBroadcast();
 				        	}else if(currentMessage.getDisplayMessageBody().contains(Ref.GAME_OVER)){
+				        		imOut = false;
 			        			Intent i = new Intent(context, GameOverPage.class);
 			        			startActivity(i);
 			        			this.abortBroadcast();
@@ -201,9 +203,17 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	
 	@Override
 	protected void onStop(){
-		sendImOut();
+		//sendImOut();
 		super.onStop();
+		//this.unregisterReceiver(this.localTextReceiver);
+	}
+	
+	@Override
+	protected void onDestroy() {
 		this.unregisterReceiver(this.localTextReceiver);
+		if(imOut) {
+			sendImOut();
+		}
 	}
 	
 	@Override
@@ -238,6 +248,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	        	public void onClick(DialogInterface dialog, int which) {
 	        		// moved to onStop()
 	        		//sendImOut();
+	        		
 	                finish();
 	                return;
 	            }

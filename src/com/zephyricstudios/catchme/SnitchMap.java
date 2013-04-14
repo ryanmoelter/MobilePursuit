@@ -53,7 +53,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	int secondCounter;
 	RelativeLayout buttonSnitchTagged;
 	
-	boolean mapExpanded;
+	boolean mapExpanded, isGameOver;
 	
 	// Typeface
 	Typeface thin, light;
@@ -85,6 +85,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         buttonSnitchTagged = (RelativeLayout)findViewById(R.id.button_snitch_tagged);
         buttonSnitchTagged.setOnClickListener(this);
         mapExpanded = false;
+        isGameOver = true;
         
         // Typeface
         thin = Typeface.createFromAsset(getAssets(), "roboto_thin.ttf");
@@ -145,6 +146,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	
 	public void checkSeekerArrayEmpty() {
 		if(seekerArray.isEmpty()) {
+			isGameOver = false;
 			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 	        alertDialog.setTitle("Game over");
 	        alertDialog.setIcon(R.drawable.ic_launcher);
@@ -162,16 +164,16 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	
 	public void sendTexts() {
 		// This might be making it stop sending texts a little in to the game.
-		/*new Thread(new Runnable() {
+		new Thread(new Runnable() {
 			public void run() {
 				for(int index = 0; seekerArray.size() > index; index++) {
     				sm.sendTextMessage(seekerArray.get(index).getNumber(), null, textContent, null, null);
     			}
 			}
-		}).start(); */
-		for(int index = 0; seekerArray.size() > index; index++) {
+		}).start();
+		/*for(int index = 0; seekerArray.size() > index; index++) {
 			sm.sendTextMessage(seekerArray.get(index).getNumber(), null, textContent, null, null);
-		}
+		} */
 	}
 	
 	@Override
@@ -203,9 +205,17 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	@Override
 	protected void onStop(){
 		super.onStop();
+	}
+	
+	@Override
+	protected void onDestroy() {
 		myLocationOverlay.disableMyLocation();
 		this.unregisterReceiver(this.localTextReceiver);
 		timer.cancel();
+		if(isGameOver) {
+			textContent = Ref.GAME_OVER;
+			sendTexts();
+		}
 	}
 	
 	@Override
@@ -326,19 +336,16 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 		if(myLocationOverlay.getMyLocation() != null) {
 			mapController.animateTo(myLocationOverlay.getMyLocation());
 		} else {
-			Toast toast = Toast.makeText(this, "Your location could not be found", Toast.LENGTH_SHORT);
-			toast.show();
+			Toast.makeText(this, "Your location could not be found", Toast.LENGTH_SHORT).show();
 		}
 	}
 	
 	public void expandMap() {
-		Toast toast = Toast.makeText(this, "Expanded!", Toast.LENGTH_SHORT);
-		toast.show();
+		Toast.makeText(this, "Expanded!", Toast.LENGTH_SHORT).show();
 	}
 	
 	public void compressMap() {
-		Toast toast = Toast.makeText(this, "Collapsed!", Toast.LENGTH_SHORT);
-		toast.show();
+		Toast.makeText(this, "Collapsed!", Toast.LENGTH_SHORT).show();
 	}
 
 }

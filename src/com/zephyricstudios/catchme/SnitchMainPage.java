@@ -156,6 +156,11 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     @Override
     public void onPause(){
     	super.onPause();
+    	//this.unregisterReceiver(this.localTextReceiver);
+    }
+    
+    @Override
+    protected void onDestroy() {
     	this.unregisterReceiver(this.localTextReceiver);
     }
     
