@@ -211,11 +211,12 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	protected void onDestroy() {
 		myLocationOverlay.disableMyLocation();
 		this.unregisterReceiver(this.localTextReceiver);
-		timer.cancel();
+		//timer.cancel();
 		if(isGameOver) {
 			textContent = Ref.GAME_OVER;
 			sendTexts();
 		}
+		super.onDestroy();
 	}
 	
 	@Override

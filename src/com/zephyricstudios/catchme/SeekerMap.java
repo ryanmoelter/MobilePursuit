@@ -214,6 +214,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 		if(imOut) {
 			sendImOut();
 		}
+		super.onDestroy();
 	}
 	
 	@Override

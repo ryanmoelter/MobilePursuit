@@ -123,6 +123,7 @@ public class SeekerWaitingPage extends Activity {
 	@Override
 	protected void onDestroy() {
 		this.unregisterReceiver(this.localTextReceiver);
+		super.onDestroy();
 	}
 	
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
