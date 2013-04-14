@@ -122,12 +122,16 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 				        	this.abortBroadcast();
 				        	SnitchMap.this.checkSeekerArrayEmpty();
 				        } else if(currentMessage.getDisplayMessageBody().contains(Ref.IM_IN)) {
-				        	Seeker.createSeeker(currentMessage.getDisplayOriginatingAddress(),
-				        			currentMessage.getMessageBody().replace(Ref.IM_IN, ""),
+				        	String name = currentMessage.getMessageBody().replace(Ref.IM_IN, "");
+				        	String number = currentMessage.getDisplayOriginatingAddress();
+				        	Seeker.createSeeker(number,
+				        			name,
 				        			seekerArray);
 				        	Toast.makeText(SnitchMap.this,
-				        			currentMessage.getMessageBody().replace(Ref.IM_IN, "") + " has joined the game",
-				        			Toast.LENGTH_SHORT);
+				        			name + " has joined the game",
+				        			Toast.LENGTH_SHORT).show();
+				        	sm.sendTextMessage(number, null, Ref.GAME_START + timerInterval, null, null);
+				        	this.abortBroadcast();
 				        }
 				           //currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
 				           //currentMessage.getDisplayMessageBody();			// has the actual message
