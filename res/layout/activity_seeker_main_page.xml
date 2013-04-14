@@ -59,13 +59,13 @@
         <EditText
             android:id="@+id/snitch_num"
             android:layout_width="match_parent"
-            android:length="13"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:fontFamily="roboto"
             android:gravity="center"
             android:hint="@string/enter_number"
             android:inputType="phone"
+            android:maxLength="13"
             android:text=""
             android:textAppearance="?android:attr/textAppearanceLargeInverse" >
 
