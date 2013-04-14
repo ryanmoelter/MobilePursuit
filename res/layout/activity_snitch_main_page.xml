@@ -117,7 +117,8 @@
         android:layout_height="match_parent"
         android:layout_above="@id/start_button_layout"
         android:layout_below="@id/title_line"
-        android:layout_marginBottom="20dp" />
+        android:layout_marginBottom="20dp"
+        android:animateLayoutChanges="true" />
 
     <!-- <ScrollView
         android:id="@+id/Scroll"

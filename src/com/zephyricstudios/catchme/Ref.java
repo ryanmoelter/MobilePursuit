@@ -6,7 +6,10 @@ import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
 
@@ -68,32 +71,63 @@ public class Ref {
 		SharedPreferences sp = context.getSharedPreferences(Ref.STORED_PREFERENCES_KEY, Context.MODE_PRIVATE);
 		AlertDialog.Builder alert = new AlertDialog.Builder(context);
 
-		alert.setTitle("Enter User Name");
-		alert.setMessage("Please enter your new name.");
-
+		alert.setTitle("Enter Your Name");
+		
+		if(firstTime) {
+			alert.setMessage("Please enter your name. Don't worry; you can change it later.");
+		} else {
+			alert.setMessage("Please enter your new name.");
+		}
+		
 		// Set an EditText view to get user input 
 		final EditText input = new EditText(context);
+		/*input.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before,
+					int count) {
+				// TODO Auto-generated method stub
+				
+			}});*/
+		input.setText(sp.getString(USERNAME_KEY, ""));
 		alert.setView(input);
 
 		alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-		public void onClick(DialogInterface dialog, int whichButton) {
-			String value = input.getText().toString();
-			if(value != "") {
-				SharedPreferences sp = context.getSharedPreferences(Ref.STORED_PREFERENCES_KEY, Context.MODE_PRIVATE);
-	    		Editor spEditor = sp.edit();
-				spEditor.putString(Ref.USERNAME_KEY, value);
-		  		spEditor.commit();
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String newName = input.getText().toString();
+				if(newName.replace(" ", "") != "") {
+					SharedPreferences sp = context.getSharedPreferences(Ref.STORED_PREFERENCES_KEY, Context.MODE_PRIVATE);
+					Editor spEditor = sp.edit();
+					spEditor.putString(Ref.USERNAME_KEY, newName);
+					spEditor.commit();
+				} else if(newName.contains(" ")) {
+					Toast toast = Toast.makeText(context, "A space is not a name", Toast.LENGTH_SHORT);
+	    			toast.show();
+				} else if(newName == "") {
+					Toast toast = Toast.makeText(context, "Please enter a name", Toast.LENGTH_SHORT);
+	    			toast.show();
+				}
 			}
-		  }
 		});
 		
-		String negativeText = "Nevermind";
 		if(!firstTime) {
-		alert.setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
-		  public void onClick(DialogInterface dialog, int whichButton) {
-		    dialog.cancel();
-		  }
-		});
+			alert.setNegativeButton("Nevermind", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					dialog.cancel();
+				}
+			});
 		}
 
 		alert.show();
