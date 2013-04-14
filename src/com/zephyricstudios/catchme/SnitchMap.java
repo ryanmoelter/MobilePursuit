@@ -121,6 +121,13 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 				    		
 				        	this.abortBroadcast();
 				        	SnitchMap.this.checkSeekerArrayEmpty();
+				        } else if(currentMessage.getDisplayMessageBody().contains(Ref.IM_IN)) {
+				        	Seeker.createSeeker(currentMessage.getDisplayOriginatingAddress(),
+				        			currentMessage.getMessageBody().replace(Ref.IM_IN, ""),
+				        			seekerArray);
+				        	Toast.makeText(SnitchMap.this,
+				        			currentMessage.getMessageBody().replace(Ref.IM_IN, "") + " has joined the game",
+				        			Toast.LENGTH_SHORT);
 				        }
 				           //currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
 				           //currentMessage.getDisplayMessageBody();			// has the actual message
@@ -211,7 +218,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	protected void onDestroy() {
 		myLocationOverlay.disableMyLocation();
 		this.unregisterReceiver(this.localTextReceiver);
-		//timer.cancel();
+		timer.cancel();
 		if(isGameOver) {
 			textContent = Ref.GAME_OVER;
 			sendTexts();
@@ -312,7 +319,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
         	public void onClick(DialogInterface dialog, int which) {
         		textContent = Ref.GAME_OVER;
-        		sendTexts();
+        		//sendTexts();
         		
         		/*for(int j = 0; j < seekerArray.size(); j++) {
         			sm.sendTextMessage(seekerArray.get(j).getNumber(), null, Ref.GAME_OVER, null, null);
