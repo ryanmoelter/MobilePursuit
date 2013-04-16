@@ -154,15 +154,8 @@ public class SeekerMainPage extends Activity implements OnClickListener{
     }
 
     public boolean checkIfRealNumber(String x) {
-    	snitchNumber = x.replace("(", "");
-    	snitchNumber = snitchNumber.replace(")", "").replace(" ", "").replace("-", "").replace("+", "");
-		if(snitchNumber.length() == 11) {
-		    return true;
-		} else if(snitchNumber.length() == 12) {
-		    return true;
-		} else if(snitchNumber.length() == 10) {
-		    return true;
-		} else if(snitchNumber.length() == 7) {
+    	snitchNumber = x.replace("(", "").replace(")", "").replace(" ", "").replace("-", "").replace("+", "");
+		if(snitchNumber.length() >= 10 && snitchNumber.length() <= 13) {
 		    return true;
 		} else {
 		    return false;
