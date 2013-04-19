@@ -35,7 +35,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 	
 	//Seeker Object Stuff
 	ListView seekerList;
-	ArrayList<Seeker> seekerArray;
+	//ArrayList<Seeker> seekerArray;
 	SeekerAdapter adapter;
 	
 	TextView title, startText, textSnitchSettings, textSending;
@@ -53,6 +53,8 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 	String textContent;
 	Thread sendTexts;
 	
+	Group group;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +67,17 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         settings.setOnClickListener(this);
         
         // Seeker Array stuff
-        seekerArray = this.getIntent().getExtras().getParcelableArrayList(Ref.SEEKER_ARRAY_KEY);
+        //seekerArray = this.getIntent().getExtras().getParcelableArrayList(Ref.SEEKER_ARRAY_KEY);
+        /*if(this.getIntent().getExtras().getParcelable(Ref.GROUP_KEY) != null) {
+        	group = this.getIntent().getExtras().getParcelable(Ref.GROUP_KEY);
+        } else {
+        	group = new Group();
+        }*/
+        if(Ref.group != null) {
+        	group = Ref.group;
+        } else {
+        	group = new Group();
+        }
         
         // Typeface
         light = Typeface.createFromAsset(getAssets(), "roboto_light.ttf");
@@ -76,7 +88,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         textSending = (TextView)findViewById(R.id.text_sending);
         textSending.setTypeface(light);
         
-        adapter = new SeekerAdapter(this, R.layout.list_item, seekerArray, this, light);
+        group.setSeekerAdapter(new SeekerAdapter(this, R.layout.list_item, group.getPeople(), this, light));
         
         seekerList = (ListView)findViewById(R.id.seeker_list);
         seekerList.setAdapter(adapter);
@@ -103,7 +115,9 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         
         timerInterval = 30;
         
-        localTextReceiver = new BroadcastReceiver(){
+        localTextReceiver = group.getBroadcastReceiver();
+        
+        /*localTextReceiver = new BroadcastReceiver(){
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -136,15 +150,15 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 				
 			}
         	
-        };
+        };*/
         filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
         
         sendTexts = new Thread() {
         	public void run() {
-        		for(int index = 0; seekerArray.size() > index; index++) {
-    				sm.sendTextMessage(seekerArray.get(index).getNumber(), null, textContent, null, null);
+        		for(Seeker person : group.getPeople()) {
+    				sm.sendTextMessage(person.getNumber(), null, textContent, null, null);
     				try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
@@ -167,7 +181,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     	Intent i;
     	switch(v.getId()) {
     	case R.id.snitch_start_button:
-    		if(!seekerArray.isEmpty()){
+    		if(!group.getPeople().isEmpty()){
     			i = new Intent(this, SnitchMap.class);
     			textContent = Ref.GAME_START + timerInterval;
     			
@@ -181,7 +195,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 					e.printStackTrace();
 				}*/
     			
-    			i.putParcelableArrayListExtra(Ref.SEEKER_ARRAY_KEY, seekerArray);
+    			/*i.putExtra(Ref.SEEKER_ARRAY_KEY, group);*/
     			i.putExtra(Ref.TIMER_INTERVAL_KEY, timerInterval);
     			this.startActivity(i);
     			finish();
@@ -194,39 +208,50 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     	
     	case R.id.item_delete:
     		int position = (int)Integer.valueOf((String)v.getTag());
-    		sm.sendTextMessage(seekerArray.get(position).getNumber(), null, Ref.YOURE_OUT, null, null);
-    		Seeker.deleteSeeker(position, seekerArray, adapter);
+    		sm.sendTextMessage(group.getPeople().get(position).getNumber(), null, Ref.YOURE_OUT, null, null);
+    		//Seeker.deleteSeeker(position, seekerArray, adapter);
+    		group.removeRunner(position);
     		break;
     	
     	case R.id.snitch_settings_button:
     		intervalSettings.setVisibility(View.VISIBLE);
     		intervalSettingsVisible = true;
     		break;
+    		
     	case R.id.button_15s:
     		timerInterval = 15;
     		intervalSettings.setVisibility(View.GONE);
             intervalSettingsVisible = false;
             textSnitchSettings.setText(timerInterval + " Seconds");
             break;
+            
     	case R.id.button_30s:
     		timerInterval = 30;
     		intervalSettings.setVisibility(View.GONE);
             intervalSettingsVisible = false;
             textSnitchSettings.setText(timerInterval + " Seconds");
             break;
+            
     	case R.id.button_45s:
     		timerInterval = 45;
     		intervalSettings.setVisibility(View.GONE);
             intervalSettingsVisible = false;
             textSnitchSettings.setText(timerInterval + " Seconds");
             break;
+            
     	case R.id.button_60s:
     		timerInterval = 60;
     		intervalSettings.setVisibility(View.GONE);
             intervalSettingsVisible = false;
             textSnitchSettings.setText(timerInterval + " Seconds");
             break;
+    	
+    	case R.id.grey_space:
+    		intervalSettings.setVisibility(View.GONE);
+    		intervalSettingsVisible = false;
+    		break;
     	}
+    		
     }
     
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -235,7 +260,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     		if(intervalSettingsVisible){
     			intervalSettings.setVisibility(View.GONE);
 	            intervalSettingsVisible = false;
-	        } else{
+	        } else {
 	        	finish();
 	        }
 

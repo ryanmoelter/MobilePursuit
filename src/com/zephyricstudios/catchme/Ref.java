@@ -8,10 +8,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,32 +24,32 @@ import com.google.android.maps.GeoPoint;
 
 public class Ref {
 	
-	static final int SETTINGS_PAGE_RESULT_CODE = 2045;
+	public static final int SETTINGS_PAGE_RESULT_CODE = 2045;
 	
-	static final String SEEKER_ARRAY_KEY = "seeker array";
-	static final String SEEKER_NUMBERS_KEY = "seeker numbers";
-	static final String SEEKER_NAMES_KEY = "seeker names";
-	static final String TIMER_INTERVAL_KEY = "interval";
-	static final String ACTION = "android.provider.Telephony.SMS_RECEIVED";
-	static final String STORED_PREFERENCES_KEY = "StoredPrefs";
-	static final String SHARED_PREFS_DEFAULT = "nope";
-	static final String USERNAME_KEY = "username";
-	static final String SNITCH_NUMBER_KEY = "snitch number";
+	public static final String SEEKER_ARRAY_KEY = "seeker array";
+	public static final String GROUP_KEY = "group";
+	public static final String SEEKER_NUMBERS_KEY = "seeker numbers";
+	public static final String SEEKER_NAMES_KEY = "seeker names";
+	public static final String TIMER_INTERVAL_KEY = "interval";
+	public static final String ACTION = "android.provider.Telephony.SMS_RECEIVED";
+	public static final String STORED_PREFERENCES_KEY = "StoredPrefs";
+	public static final String SHARED_PREFS_DEFAULT = "nope";
+	public static final String USERNAME_KEY = "username";
+	public static final String SNITCH_NUMBER_KEY = "snitch number";
 	
 	//Texting codes
-	static final String CATCH_ME = ".Catch Me. ";
-	static final String IM_IN ="I'm in. ";
-	static final String IM_OUT = "I'm out";
-	static final String YOURE_IN = "You're in. ";
-	static final String YOURE_OUT = "You're out";
-	static final String HES_IN = "He's in. ";
-	static final String HES_OUT = "He's out. ";
-	static final String GEOPOINT = "gp: ";
-	static final String GAME_START = "Start game. ";
-	static final String GAME_OVER = "Game over";
+	public static final String CATCH_ME = ".Catch Me. ";
+	public static final String IM_IN ="I'm in. ";
+	public static final String IM_OUT = "I'm out";
+	public static final String YOURE_IN = "You're in. ";
+	public static final String YOURE_OUT = "You're out";
+	public static final String HES_IN = "He's in. ";
+	public static final String HES_OUT = "He's out. ";
+	public static final String GEOPOINT = "gp: ";
+	public static final String GAME_START = "Start game. ";
+	public static final String GAME_OVER = "Game over";
 	
-	public static ArrayList<Seeker> seekerArray;
-	public static SeekerAdapter adapter;
+	public static Group group;
 	
 	
 	public static GeoPoint stringToGeoPoint(String geoString){
@@ -138,14 +140,25 @@ public class Ref {
 		alert.show();
 	}
 	
-	public void joinGameAlert(String name, String number, Context context) {
+	public static void makeAlert(String title, String content, OnClickListener onPositive,
+								 String positiveText, OnClickListener onNegative,
+								 String negativeText, Context context) {
+		AlertDialog.Builder alert = new AlertDialog.Builder(context);
+		alert.setTitle(title);
+		alert.setMessage(content);
+		
+		alert.setPositiveButton(positiveText, onPositive);
+		alert.setNegativeButton(negativeText, onNegative);
+	}
+	
+	public static void joinGameAlert(final String name, final String number, final Context context) {
 		AlertDialog.Builder alert = new AlertDialog.Builder(context);
 		alert.setTitle("Join Game");
 		alert.setMessage(name + " wants you to join their game.");
 		
 		alert.setPositiveButton("Sure", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int button) {
-				// TODO joinGame();
+				Group.joinGame(context, SmsManager.getDefault(), number);
 			}
 		});
 		
@@ -157,7 +170,7 @@ public class Ref {
 	}
 	
 	// This is experimental, I have no idea how exactly to get a global BroadcastReceiver working
-	public BroadcastReceiver createBroadcastReceiver(/*ArrayList<Seeker> seekerArray, SeekerAdapter adapter*/) {
+	/*public static BroadcastReceiver createBroadcastReceiver() {
 		return new BroadcastReceiver() {
 
 			@Override
@@ -179,18 +192,41 @@ public class Ref {
 				    for (SmsMessage currentMessage : messages) {
 				    	if(currentMessage.getDisplayMessageBody().contains(CATCH_ME)) {
 				    		number = currentMessage.getDisplayOriginatingAddress();
-				    		message = currentMessage.getDisplayMessageBody();
+				    		message = currentMessage.getDisplayMessageBody().replace(CATCH_ME, "");
 				    		
-				    		if(message.contains(Ref.IM_IN)){
-				    			name = message.replace(Ref.IM_IN, "");
-					    		Seeker.createSeeker(number, name, seekerArray, adapter);
+				    		if(message.contains(IM_IN)){
+				    			name = message.replace(IM_IN, "");
+					    		group.receiveImIn(name, number);
 					    		
-					    	} else if(message.contains(Ref.IM_OUT)) {
-					    		Seeker.deleteSeekerByNum(number, seekerArray);
+					    	} else if(message.contains(IM_OUT)) {
+					    		group.receiveImOut(number);
 					    		
 					    	} else if(message.contains(YOURE_IN)) {
 					    		name = message.replace(YOURE_IN, "");
-					    		joinGameAlert(name, number, context);
+					    		Group.receiveYoureIn(name, number, context);
+					    		
+					    	} else if(message.contains(YOURE_OUT)) {
+					    		group.getActAdapter().receiveYoureOut();
+					    		
+					    	} else if(message.contains(HES_IN)) {
+					    		name = message.replace(HES_IN, "");
+					    		
+					    		group.receiveHesIn(name, number);
+					    		
+					    	} else if(message.contains(HES_OUT)) {
+					    		group.receiveHesOut(number);
+					    		
+					    	} else if(message.contains(GEOPOINT)) {
+					    		group.getActAdapter().receiveGeopoint(
+					    				message.replace(GEOPOINT, ""));
+					    		
+					    	} else if(message.contains(GAME_START)) {
+					    		group.getActAdapter().receiveGameStart(
+					    				Integer.valueOf(message.replace(GAME_START, "")));
+					    		
+					    	} else if(message.contains(GAME_OVER)) {
+					    		group.getActAdapter().receiveGameOver();
+					    		
 					    	}
 				    		
 				    		this.abortBroadcast();
@@ -201,5 +237,5 @@ public class Ref {
 				}
 			}
 		};
-	}
+	}*/
 }

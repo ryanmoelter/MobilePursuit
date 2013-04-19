@@ -33,7 +33,8 @@ public class MainPage extends Activity implements OnClickListener {
 	BroadcastReceiver localTextReceiver;
 	IntentFilter filter;
 	//boolean bool;
-	ArrayList<Seeker> seekerArray;
+	//ArrayList<Seeker> seekerArray;
+	Group group;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,7 +47,12 @@ public class MainPage extends Activity implements OnClickListener {
         buttonMainConfused = (RelativeLayout)findViewById(R.id.button_main_confused);
         buttonMainConfused.setOnClickListener(this);
         
-        seekerArray = new ArrayList<Seeker>();
+        //seekerArray = new ArrayList<Seeker>();
+        if(Ref.group != null) {
+        	group = Ref.group;
+        } else {
+        	group = new Group();
+        }
         
         textMainIAm = (TextView)findViewById(R.id.text_main_i_am);
         textMainSeeker = (TextView)findViewById(R.id.text_main_seeker);
@@ -66,7 +72,16 @@ public class MainPage extends Activity implements OnClickListener {
     		Ref.changeName(this, true);
     	}
     	
-    	localTextReceiver = new BroadcastReceiver(){
+    	group.setActAdapter(new ActivityAdapter(group) {
+    		@Override
+    		public void end() {
+    			MainPage.this.unregisterReceiver(localTextReceiver);
+    			Ref.group = MainPage.this.group;
+    		}
+    	});
+    	
+    	localTextReceiver = group.getBroadcastReceiver();
+    	/*localTextReceiver = new BroadcastReceiver(){
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				Bundle bundle = intent.getExtras();
@@ -95,14 +110,14 @@ public class MainPage extends Activity implements OnClickListener {
 				    }
 				}
 			}
-        };
+        };*/
         filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
     	
     }
     
-    public void createGame(ArrayList<Seeker> seekerList) {
+    /*public void createGame(ArrayList<Seeker> seekerList) {
     	
     	//boolean bool = false;
     	seekerArray = seekerList;
@@ -134,14 +149,14 @@ public class MainPage extends Activity implements OnClickListener {
 			Intent i = new Intent(this, SnitchMainPage.class);
 			i.putParcelableArrayListExtra(Ref.SEEKER_ARRAY_KEY, seekerArray);
 			this.startActivity(i);
-		}*/
-    }
+		}* /
+    }*/
     
-    public void startSnitch() {
+    /*public void startSnitch() {
     	Intent i = new Intent(this, SnitchMainPage.class);
-		i.putParcelableArrayListExtra(Ref.SEEKER_ARRAY_KEY, seekerArray);
+		//i.putParcelableArrayListExtra(Ref.SEEKER_ARRAY_KEY, seekerArray);
 		this.startActivity(i);
-    }
+    }*/
     
     /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -168,20 +183,16 @@ public class MainPage extends Activity implements OnClickListener {
 	} */
     
     @Override
-    public void onPause() {
-    	super.onPause();
-    	this.unregisterReceiver(this.localTextReceiver);
-    }
-    
-    public void onStop() {
-    	super.onStop();
-    	//this.unregisterReceiver(this.localTextReceiver);
+    protected void onDestroy() {
+    	this.unregisterReceiver(localTextReceiver);
+    	super.onDestroy();
     }
     
     @Override
-    public void onResume(){
-    	super.onResume();
-    	this.registerReceiver(this.localTextReceiver, filter);
+    protected void onRestart() {
+    	this.group = Ref.group;
+    	this.registerReceiver(localTextReceiver, filter);
+    	super.onRestart();
     }
     
 	public void onClick(View buttonChosen) {
@@ -193,7 +204,7 @@ public class MainPage extends Activity implements OnClickListener {
 			break;
 		case R.id.button_main_snitch:
 			i = new Intent(this, SnitchMainPage.class);
-			i.putParcelableArrayListExtra(Ref.SEEKER_ARRAY_KEY, seekerArray);
+			//i.putParcelableArrayListExtra(Ref.SEEKER_ARRAY_KEY, seekerArray);
 			break;
 		case R.id.button_main_confused:
 			i = new Intent(this, ConfusedMenu.class);
@@ -201,6 +212,8 @@ public class MainPage extends Activity implements OnClickListener {
 		}
 		
 		if(i != null) {
+			Ref.group = this.group;
+			this.unregisterReceiver(localTextReceiver);
 			this.startActivity(i);
 		}
 	}

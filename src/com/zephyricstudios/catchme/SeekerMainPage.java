@@ -34,7 +34,7 @@ public class SeekerMainPage extends Activity implements OnClickListener{
 	private Button snitchContactPicker;
 	private RelativeLayout startButton;
 	private EditText box;
-	private static final int CONTACT_PICKER_RESULT = 1001; 
+	private static final int CONTACT_PICKER_RESULT = 1001;
 	String num = "";
 	String snitchNumber = "";
 	SmsManager sm = SmsManager.getDefault();
@@ -72,24 +72,6 @@ public class SeekerMainPage extends Activity implements OnClickListener{
         box.setTypeface(light);
         
     }
-    
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_seeker_main_page, menu);
-        return true;
-    }
-    
-    @Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
-	    switch (item.getItemId()) {
-	    case R.id.menu_change_name:
-	    	Ref.changeName(this, false);
-	        return true;
-	    default:
-	        return super.onOptionsItemSelected(item);
-	    }
-	}
    
     @Override  
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {  
@@ -126,24 +108,24 @@ public class SeekerMainPage extends Activity implements OnClickListener{
                     builder.setTitle("Choose a number");
                     builder.setItems(items, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int item) {
-                            String selectedNumber = items[item].toString();
-                            selectedNumber = selectedNumber.replace("-", "");
+                            snitchNumber = items[item].toString();
+                            //selectedNumber = selectedNumber.replace("-", "");
                             //num = selectedNumber;
-                            phoneInput.setText(selectedNumber);
+                            phoneInput.setText(snitchNumber);
                         }
                     });
                     AlertDialog alert = builder.create();
                     if(allNumbers.size() > 1) {
                         alert.show();
                     } else {
-                        String selectedNumber = phoneNumber.toString();
-                        selectedNumber = selectedNumber.replace("-", "");
+                        snitchNumber = phoneNumber.toString();
+                        //selectedNumber = selectedNumber.replace("-", "");
                         //num = selectedNumber;
-                        phoneInput.setText(selectedNumber);
+                        phoneInput.setText(snitchNumber);
                     }
 
                     if (phoneNumber.length() == 0) {  
-                        //no numbers found actions  
+                        //no numbers found actions
                     }  
                 }  
                 break;  
@@ -153,10 +135,25 @@ public class SeekerMainPage extends Activity implements OnClickListener{
         }  
     }
 
-    public boolean checkIfRealNumber(String x) {
-    	snitchNumber = x.replace("(", "");
-    	snitchNumber = snitchNumber.replace(")", "").replace(" ", "").replace("-", "").replace("+", "");
-		if(snitchNumber.length() == 11) {
+    public String convertToOnlyNumbers(String number) {
+    	return number.replace("(", "")
+					   .replace(")", "")
+					   .replace(" ", "")
+					   .replace("-", "")
+					   .replace("+", "");
+    }
+    
+    public boolean checkIfRealNumber(String number) {
+    	int length = convertToOnlyNumbers(number).length();
+    	
+    	if(length == 7) {
+    		Toast.makeText(this, "Please add an area code", Toast.LENGTH_SHORT).show();
+    	}
+    	else if(length >= 10 && length <= 13) {
+    		return true;
+    	}
+    	return false;
+		/*if(snitchNumber.length() == 11) {
 		    return true;
 		} else if(snitchNumber.length() == 12) {
 		    return true;
@@ -166,16 +163,7 @@ public class SeekerMainPage extends Activity implements OnClickListener{
 		    return true;
 		} else {
 		    return false;
-		}
-    }
-    
-	private void numberDoesntWork(){
-		Context context = getApplicationContext();
-		CharSequence text = "Please enter a valid number";
-		int duration = Toast.LENGTH_SHORT;
-
-		Toast toast = Toast.makeText(context, text, duration);
-		toast.show();
+		}*/
     }
     
 	public void onClick(View v) {
@@ -184,18 +172,18 @@ public class SeekerMainPage extends Activity implements OnClickListener{
 			Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI);
 			startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
 		} else if(v.equals(findViewById(R.id.start_button))) {
-			num = box.getText().toString();
-			if(checkIfRealNumber(num) == true) {
+			snitchNumber = box.getText().toString();
+			if(checkIfRealNumber(snitchNumber) == true) {
 				//defaultNumber stores the phone number to text. this is where you send out something to the snitch
 				SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
-		    	Editor spEditor = sp.edit();
-		    	String username = sp.getString(Ref.USERNAME_KEY, snitchNumber);
+				snitchNumber = convertToOnlyNumbers(snitchNumber);
+		    	String username = sp.getString(Ref.USERNAME_KEY, "Someone");
 				seekerWaitIntent.putExtra(Ref.SNITCH_NUMBER_KEY, snitchNumber);
 				sm.sendTextMessage(snitchNumber, null, Ref.IM_IN + username, null, null);
 				this.startActivity(seekerWaitIntent);
 				finish();
 			} else {
-				numberDoesntWork();
+				Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show();
 			}
 
 		}

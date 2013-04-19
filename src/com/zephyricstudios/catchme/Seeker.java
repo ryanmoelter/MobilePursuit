@@ -6,15 +6,39 @@ import android.os.Parcelable;
 
 public class Seeker implements Parcelable {
 	
-	String mName;
-	String mNumber;
+	private String mName, mNumber;
+	private boolean isRunner;
 	
 	public Seeker(String number, String name) {
 		mName = name;
 		mNumber = number;
+		isRunner = false;
 	}
 	
-	public static void createSeeker(String number, String name, ArrayList<Seeker> array, SeekerAdapter adapter) {
+	// Queries
+	public String getName() {
+		return mName;
+	}
+	
+	public String getNumber() {
+		return mNumber;
+	}
+	
+	public boolean isRunner() {
+		return isRunner;
+	}
+	
+	// Setters
+	public void makeRunner() {
+		isRunner = true;
+	}
+	
+	public void makeNotRunner() {
+		isRunner = false;
+	}
+
+	
+	/*public static void createSeeker(String number, String name, ArrayList<Seeker> array, SeekerAdapter adapter) {
 		array.add(new Seeker(number, name));
 		adapter.notifyDataSetChanged();
 	}
@@ -26,14 +50,6 @@ public class Seeker implements Parcelable {
 	public static void deleteSeeker(int index, ArrayList<Seeker> array, SeekerAdapter adapter) {
 		array.remove(index);
 		adapter.notifyDataSetChanged();
-	}
-	
-	public String getName() {
-		return mName;
-	}
-	
-	public String getNumber() {
-		return mNumber;
 	}
 	
 	public static void deleteSeekerByNum(String number, ArrayList<Seeker> array) {
@@ -52,7 +68,7 @@ public class Seeker implements Parcelable {
 			}
 		}
 		return "Error";
-	}
+	}*/
 	
 	/* everything below here is for implementing Parcelable */
 

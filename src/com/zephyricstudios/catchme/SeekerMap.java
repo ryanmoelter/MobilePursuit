@@ -151,11 +151,11 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	
 	public void startupCenterOnCurrent() {
 		// I couldn't get this to work...
-		/*new Thread(new Runnable() {
+		/*new Thread() {
 			public void run() {
 				while(myLocationOverlay.getMyLocation() == null) {
 					/*try {
-						this.wait(100);
+						this.wait(500);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
