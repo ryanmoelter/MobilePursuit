@@ -46,11 +46,12 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	MyLocationOverlay myLocationOverlay;
 	List<Overlay> mapOverlays;
 	MapsItemizedOverlay itemizedOverlay, newestOverlay;
-	int markerCounter, timerInterval, secondCounter;
+	
+	int markerCounter, secondCounter, displayMinutes, displaySeconds, countdownSeconds;
 	boolean findMe, imOut;
+	
 	Timer timer;
 	
-	SmsManager sm;
 	BroadcastReceiver localTextReceiver;
 	IntentFilter filter;
 	
@@ -58,7 +59,8 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	Typeface thin;
 	TextView seekerTimer;
 	
-	String snitchNumber;
+	Group group;
+	Game game;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -90,13 +92,30 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         thin = Typeface.createFromAsset(getAssets(), "roboto_thin.ttf");
         seekerTimer.setTypeface(thin);
         
-        timerInterval = this.getIntent().getExtras().getInt(Ref.TIMER_INTERVAL_KEY);
-        snitchNumber = this.getIntent().getExtras().getString(Ref.SNITCH_NUMBER_KEY);
         secondCounter = 0;
         
-        sm = SmsManager.getDefault();
+        if(Ref.group != null) {
+        	group = Ref.group;
+        } else {
+        	group = new Group();
+        }
         
-        localTextReceiver = new BroadcastReceiver(){
+        group.setActAdapter(new ActivityAdapter(group) {
+        	// put stuff in here
+        	@Override
+        	public void receiveGameOver() {
+        		imOut = false;
+        		Ref.group = group;
+        		Ref.game = game;
+    			startActivity(new Intent(SeekerMap.this, GameOverPage.class));
+    			SeekerMap.this.finish();
+        	}
+        });
+        
+        game = Ref.game;
+        
+        localTextReceiver = group.getBroadcastReceiver();
+        /*localTextReceiver = new BroadcastReceiver(){
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -120,8 +139,9 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 				    			resetCounter();
 				        		this.abortBroadcast();
 				        	}else if(currentMessage.getDisplayMessageBody().contains(Ref.GEOPOINT)){
-				        		String geoStringTemp = currentMessage.getDisplayMessageBody().replace(Ref.GEOPOINT, "");
-				        		GeoPoint geoPointTemp = Ref.stringToGeoPoint(geoStringTemp); 	//add textview to display								
+				        		String geoStringTemp = currentMessage.getDisplayMessageBody()
+				        		.replace(Ref.GEOPOINT, "");
+				        		GeoPoint geoPointTemp = Ref.stringToGeoPoint(geoStringTemp);								
 				        		
 				        		addMarker(geoPointTemp);
 				        		resetCounter(); //Reset the timer
@@ -134,14 +154,12 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 			        			this.abortBroadcast();
 			        			finish();
 			        		}
-				               //currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
-				               //currentMessage.getDisplayMessageBody();				// has the actual message
 				        }
 				}
 				
 			}
         	
-        };
+        }; */
         filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
@@ -150,12 +168,12 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	}
 	
 	public void startupCenterOnCurrent() {
-		// I couldn't get this to work...
+		// I'll try this once I make sure the rest is working
 		/*new Thread() {
 			public void run() {
 				while(myLocationOverlay.getMyLocation() == null) {
 					/*try {
-						this.wait(500);
+						Thread.sleep(500);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -192,36 +210,24 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	}
 	
 	@Override
-	protected void onPause(){
-		super.onPause();
-		// when our activity pauses, we want to remove listening for location updates
-    	myLocationOverlay.disableMyLocation();
-    	//this.unregisterReceiver(this.localTextReceiver);
-	}
-	
-	@Override
 	protected void onStop(){
-		//sendImOut();
 		super.onStop();
-		//this.unregisterReceiver(this.localTextReceiver);
+    	myLocationOverlay.disableMyLocation();
 	}
 	
 	@Override
 	protected void onDestroy() {
 		this.unregisterReceiver(this.localTextReceiver);
 		if(imOut) {
-			sendImOut();
+			group.sendImOut();
 		}
 		super.onDestroy();
 	}
 	
 	@Override
-	protected void onResume(){
-		super.onResume();
-		// when our activity resumes, we want to register for location updates
+	protected void onRestart(){
+		super.onRestart();
     	myLocationOverlay.enableMyLocation();
-        //Ref.activityState = Ref.SEEKERMAP;
-        //this.registerReceiver(this.localTextReceiver, filter);
 
 	}
 
@@ -237,28 +243,46 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			
+			Ref.makeAlert("Leave Game?", "Do you want to abandon the game?",
+					new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							SeekerMap.this.finish();
+						}
+						
+					}, "Yes",
+					new DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {}
+						
+					}, "Nevermind", this);
 
-			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-	        alertDialog.setTitle("Leave Game?");
-	        alertDialog.setIcon(R.drawable.ic_launcher);
-
-	        alertDialog.setMessage("Do you want to leave the game?");
-	        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
-	        	public void onClick(DialogInterface dialog, int which) {
-	        		// moved to onStop()
-	        		//sendImOut();
-	        		
-	                finish();
-	                return;
-	            }
-	        }); 
-	        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
-	        	public void onClick(DialogInterface dialog, int which) {
-	        		dialog.cancel();
-	        		return;
-	        	}
-	        }); 
-	        alertDialog.show();
+//			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+//	        alertDialog.setTitle("Leave Game?");
+//	        alertDialog.setIcon(R.drawable.ic_launcher);
+//
+//	        alertDialog.setMessage("Do you want to leave the game?");
+//	        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
+//	        	new DialogInterface.OnClickListener() {
+//	        		public void onClick(DialogInterface dialog, int which) {
+//	        			// moved to onStop()
+//	        			//sendImOut();
+//	        		
+//	        			finish();
+//	        			return;
+//	        		}
+//	        	}); 
+//	        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No",
+//	        	new DialogInterface.OnClickListener() {
+//	        		public void onClick(DialogInterface dialog, int which) {
+//	        			dialog.cancel();
+//	        			return;
+//	        		}
+//	        	}); 
+//	        alertDialog.show();
 
 	        return true;
 	     }
@@ -284,15 +308,15 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 
         @Override
         public void run() {
+        	if(secondCounter >= game.getInterval()){
+        		secondCounter = game.getInterval();
+        	}
+        	countdownSeconds = game.getInterval() - secondCounter;
+    		displayMinutes = countdownSeconds / 60;
+    		displaySeconds = countdownSeconds % 60;
+    		
             SeekerMap.this.runOnUiThread(new Runnable() {
-
                 public void run() {
-                	if(secondCounter>=timerInterval){
-                		secondCounter = timerInterval;
-                	}
-                	int countdownSeconds = timerInterval - secondCounter;
-            		int displayMinutes = countdownSeconds / 60;
-            		int displaySeconds = countdownSeconds % 60;
             		seekerTimer.setText(String.format("%d:%02d", displayMinutes, displaySeconds));
             		secondCounter++;
                 }
@@ -302,10 +326,6 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	
 	public void resetCounter() {
 		secondCounter = 0;
-	}
-	
-	public void sendImOut() {
-		sm.sendTextMessage(snitchNumber, null, Ref.IM_OUT, null, null);
 	}
 	
 	public void centerOnCurrent() {

@@ -47,7 +47,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_toRightOf="@id/image_seeker"
                     android:fontFamily="roboto"
-                    android:text="@string/seeker"
+                    android:text="@string/join"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
             </RelativeLayout>
 
@@ -78,7 +78,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_toRightOf="@id/image_snitch"
                     android:fontFamily="roboto"
-                    android:text="@string/snitch"
+                    android:text="@string/create"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
             </RelativeLayout>
 
@@ -112,7 +112,7 @@
             </RelativeLayout>
         </RelativeLayout>
     </LinearLayout>
-    <LinearLayout
+    <!--<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/main_button_holder"
@@ -133,5 +133,5 @@
         	android:text="@string/i_am"
         	android:textAppearance="?android:attr/textAppearanceLarge"
         	android:layout_weight="9" />
-    </LinearLayout>
+    </LinearLayout>-->
 </RelativeLayout>

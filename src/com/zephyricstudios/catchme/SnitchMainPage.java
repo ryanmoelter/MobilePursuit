@@ -1,13 +1,12 @@
 package com.zephyricstudios.catchme;
 
-import java.util.ArrayList;
 import android.os.Bundle;
 import android.app.Activity;
 import android.telephony.SmsManager;
-import android.telephony.SmsMessage;
 import android.view.KeyEvent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.view.View;
@@ -26,7 +25,6 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 	
 	RelativeLayout start;
 	RelativeLayout settings;
-	int timerInterval;
 	
 	// Typeface
 	Typeface light;
@@ -36,11 +34,11 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 	//Seeker Object Stuff
 	ListView seekerList;
 	//ArrayList<Seeker> seekerArray;
-	SeekerAdapter adapter;
+	//SeekerAdapter adapter;
 	
 	TextView title, startText, textSnitchSettings, textSending;
 	
-	Boolean intervalSettingsVisible;
+	boolean intervalSettingsVisible, leaving = false;
 	
 	RelativeLayout sendingLayout;
 	LinearLayout intervalSettings;
@@ -50,10 +48,11 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 	IntentFilter filter;
 	
 	//Texting Stuff
-	String textContent;
-	Thread sendTexts;
+	//String textContent;
+	//Thread sendTexts;
 	
 	Group group;
+	Game game;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,6 +78,72 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         	group = new Group();
         }
         
+        group.setActAdapter(new ActivityAdapter(group) {
+        	@Override
+        	public void receiveYoureIn(String name, final String number, final Context context) {
+        		if(group.getImRunner()) {
+        			Ref.makeAlert("You're invited", name + " wants you to join their game. This "
+        					+ "will abandon the current group.",
+        					new DialogInterface.OnClickListener() { // Positive
+        						
+        						@Override
+        						public void onClick(DialogInterface dialog, int which) {
+        							group.sendImIn(context, number);
+        							group.sendImOut();
+        							Intent i = new Intent(context, SnitchMainPage.class);
+        							context.startActivity(i);
+        							group.getActAdapter().end();
+        							
+        						}
+        					}, "Okay", 
+        					new DialogInterface.OnClickListener() { // Negative
+        						
+        						@Override
+        						public void onClick(DialogInterface dialog, int which) {}
+        						
+        					}, "No, go away", context);
+        		} else {
+        			Ref.makeAlert("You're invited", name + " wants you to join their game.",
+        					new DialogInterface.OnClickListener() { // Positive
+        						
+        						@Override
+        						public void onClick(DialogInterface dialog, int which) {
+        							group.sendImIn(context, number);
+        							Intent i = new Intent(context, SnitchMainPage.class);
+        							context.startActivity(i);
+        							group.getActAdapter().end();
+        							
+        						}
+        					}, "Okay", 
+        					new DialogInterface.OnClickListener() { // Negative
+        						
+        						@Override
+        						public void onClick(DialogInterface dialog, int which) {}
+        						
+        					}, "No, go away", context);
+        		}
+        	}
+        	
+        	@Override
+        	public void receiveGameStart(int interval) {
+        		game.setInterval(interval);
+        		Ref.group = group;
+        		Ref.game = game;
+        		leaving = true;
+        		SnitchMainPage.this.finish();
+        	}
+        });
+        
+        group.setSeekerAdapter(new SeekerAdapter(this, R.layout.list_item, group.getPeople(), this, light));
+        seekerList = (ListView)findViewById(R.id.seeker_list);
+        seekerList.setAdapter(group.getSeekerAdapter());
+        
+        if(Ref.game != null) {
+        	game = Ref.game;
+        } else {
+        	game = new Game(group);
+        }
+        
         // Typeface
         light = Typeface.createFromAsset(getAssets(), "roboto_light.ttf");
         title = (TextView)findViewById(R.id.text_snitch_title);
@@ -88,14 +153,11 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         textSending = (TextView)findViewById(R.id.text_sending);
         textSending.setTypeface(light);
         
-        group.setSeekerAdapter(new SeekerAdapter(this, R.layout.list_item, group.getPeople(), this, light));
-        
-        seekerList = (ListView)findViewById(R.id.seeker_list);
-        seekerList.setAdapter(adapter);
-        
         intervalSettings = (LinearLayout)findViewById(R.id.interval_settings_layout);
         intervalSettings.setVisibility(View.GONE);
         intervalSettingsVisible = false;
+        
+        // TODO This needs to go.
         btnInterval15s = (Button)findViewById(R.id.button_15s);
         btnInterval30s = (Button)findViewById(R.id.button_30s);
         btnInterval45s = (Button)findViewById(R.id.button_45s);
@@ -113,67 +175,19 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         
         sendingLayout = (RelativeLayout)findViewById(R.id.loading_layout);
         
-        timerInterval = 30;
-        
         localTextReceiver = group.getBroadcastReceiver();
-        
-        /*localTextReceiver = new BroadcastReceiver(){
-
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				
-				Bundle bundle = intent.getExtras();
-
-				if (bundle != null) {
-					Object[] pdusObj = (Object[]) bundle.get("pdus");
-				    SmsMessage[] messages = new SmsMessage[pdusObj.length];
-				    
-				    // getting SMS information from Pdu.
-				    for (int i = 0; i < pdusObj.length; i++) {
-				        messages[i] = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
-				    }
-
-				    for (SmsMessage currentMessage : messages) {
-				    	if(currentMessage.getDisplayMessageBody().contains(Ref.IM_IN)){ 
-				    		Seeker.createSeeker(currentMessage.getDisplayOriginatingAddress(),
-				    				currentMessage.getDisplayMessageBody().replace(Ref.IM_IN, ""),
-				    				seekerArray, adapter);
-				    		this.abortBroadcast();
-				    	} else if(currentMessage.getDisplayMessageBody().contains(Ref.IM_OUT)) {
-				    		Seeker.deleteSeekerByNum(currentMessage.getDisplayOriginatingAddress(), seekerArray);
-				    		this.abortBroadcast();
-				    	}
-				        //currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
-				        //currentMessage.getDisplayMessageBody();				// has the actual message
-				    }
-				}
-				
-			}
-        	
-        };*/
         filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
-        
-        sendTexts = new Thread() {
-        	public void run() {
-        		for(Seeker person : group.getPeople()) {
-    				sm.sendTextMessage(person.getNumber(), null, textContent, null, null);
-    				try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-    			}
-        	}
-        };
-        
     }
     
     @Override
     protected void onDestroy() {
     	this.unregisterReceiver(this.localTextReceiver);
+    	group.disableSeekerAdapter();
+//    	if(!leaving) {
+//    		group.sendImOut();
+//    	}
     	super.onDestroy();
     }
     
@@ -183,34 +197,28 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     	case R.id.snitch_start_button:
     		if(!group.getPeople().isEmpty()){
     			i = new Intent(this, SnitchMap.class);
-    			textContent = Ref.GAME_START + timerInterval;
+    			
+    			group.sendGameStart(game.getInterval());
     			
     			sendingLayout.setVisibility(View.VISIBLE);
     			
-    			sendTexts.start();
-    			/*try {
-					wait(seekerArray.size() * 500);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}*/
+    			leaving = true;
+    			//i.putExtra(Ref.TIMER_INTERVAL_KEY, game.getInterval());
     			
-    			/*i.putExtra(Ref.SEEKER_ARRAY_KEY, group);*/
-    			i.putExtra(Ref.TIMER_INTERVAL_KEY, timerInterval);
+    			Ref.group = group;
+    			Ref.game = game;
     			this.startActivity(i);
     			finish();
     		} else {
-    			//							 context, text, 									  duration
-    			Toast toast = Toast.makeText(this, "At least one seeker is required to continue", Toast.LENGTH_SHORT);
-    			toast.show();
+    			Toast.makeText(this, "At least one seeker is required to continue",
+    					Toast.LENGTH_SHORT).show();
     		}
     		break;
     	
     	case R.id.item_delete:
     		int position = (int)Integer.valueOf((String)v.getTag());
-    		sm.sendTextMessage(group.getPeople().get(position).getNumber(), null, Ref.YOURE_OUT, null, null);
-    		//Seeker.deleteSeeker(position, seekerArray, adapter);
-    		group.removeRunner(position);
+    		group.sendYoureOut(position);
+    		group.removePerson(position);
     		break;
     	
     	case R.id.snitch_settings_button:
@@ -219,31 +227,31 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     		break;
     		
     	case R.id.button_15s:
-    		timerInterval = 15;
+    		game.setInterval(15);
     		intervalSettings.setVisibility(View.GONE);
             intervalSettingsVisible = false;
-            textSnitchSettings.setText(timerInterval + " Seconds");
+            textSnitchSettings.setText(game.getInterval() + " Seconds");
             break;
             
     	case R.id.button_30s:
-    		timerInterval = 30;
+    		game.setInterval(30);
     		intervalSettings.setVisibility(View.GONE);
             intervalSettingsVisible = false;
-            textSnitchSettings.setText(timerInterval + " Seconds");
+            textSnitchSettings.setText(game.getInterval() + " Seconds");
             break;
             
     	case R.id.button_45s:
-    		timerInterval = 45;
+    		game.setInterval(45);
     		intervalSettings.setVisibility(View.GONE);
             intervalSettingsVisible = false;
-            textSnitchSettings.setText(timerInterval + " Seconds");
+            textSnitchSettings.setText(game.getInterval() + " Seconds");
             break;
             
     	case R.id.button_60s:
-    		timerInterval = 60;
+    		game.setInterval(60);
     		intervalSettings.setVisibility(View.GONE);
             intervalSettingsVisible = false;
-            textSnitchSettings.setText(timerInterval + " Seconds");
+            textSnitchSettings.setText(game.getInterval() + " Seconds");
             break;
     	
     	case R.id.grey_space:
@@ -260,10 +268,33 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     		if(intervalSettingsVisible){
     			intervalSettings.setVisibility(View.GONE);
 	            intervalSettingsVisible = false;
+	        } else if(!group.getPeople().isEmpty()) {
+	        	Ref.makeAlert("Quit?", "Do you want to abandon the game?",
+	        			new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								group.sendImOut();
+								group.clear();
+								Ref.group = group;
+								leaving = true;
+								SnitchMainPage.this.finish();
+							}
+						}, 
+	        			"Yes", 
+	        			new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// Do nothing
+							}
+						}, 
+	        			"Nevermind", this);
 	        } else {
 	        	finish();
 	        }
-
 	        return true;
 	     }
 	     return super.onKeyDown(keyCode, event);

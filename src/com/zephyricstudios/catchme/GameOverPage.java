@@ -3,7 +3,6 @@ package com.zephyricstudios.catchme;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
@@ -12,7 +11,7 @@ import android.graphics.Typeface;
 
 public class GameOverPage extends Activity implements OnClickListener {
 	
-	RelativeLayout buttonGameOver;
+	RelativeLayout buttonPlayAgain;
 	
 	// Typeface
 	TextView textPlayAgain, textGame, textOver;
@@ -22,8 +21,8 @@ public class GameOverPage extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game_over_page);
-		buttonGameOver = (RelativeLayout)findViewById(R.id.button_play_again);
-		buttonGameOver.setOnClickListener(this);
+		buttonPlayAgain = (RelativeLayout)findViewById(R.id.button_play_again);
+		buttonPlayAgain.setOnClickListener(this);
 		
 		// Typeface
 		light = Typeface.createFromAsset(getAssets(), "roboto_light.ttf");
@@ -40,7 +39,8 @@ public class GameOverPage extends Activity implements OnClickListener {
 	}
 
 	public void onClick(View btnClicked) {
-		if(btnClicked == buttonGameOver){
+		if(btnClicked == buttonPlayAgain){
+			this.startActivity(new Intent(this, SnitchMainPage.class));
 			finish();
 		}
 	}

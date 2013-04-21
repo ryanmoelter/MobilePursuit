@@ -4,12 +4,9 @@ import java.util.ArrayList;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.widget.Toast;
@@ -17,36 +14,27 @@ import android.widget.Toast;
 public class Group /*implements Parcelable*/ {
 	private ArrayList<Seeker> people;
 	private SeekerAdapter seekerAdapter;
-	private boolean isSeekerAdapterNeeded, imRunner;
+	private boolean isSeekerAdapterNeeded = false, imRunner = true;
 	private ActivityAdapter actAdapter;
-	private BroadcastReceiver broadcastReceiver;
+	private BroadcastReceiver broadcastReceiver = createBroadcastReceiver();
+	private static SmsManager sm = SmsManager.getDefault();
 	
 	
 	// Constructors
 	public Group() {
 		people = new ArrayList<Seeker>();
-		seekerAdapter = null;
-		isSeekerAdapterNeeded = false;
-		actAdapter = null;
 		imRunner = true;
-		broadcastReceiver = createBroadcastReceiver();
 	}
 	
 	public Group(ArrayList<Seeker> people) {
 		this.people = people;
-		seekerAdapter = null;
-		isSeekerAdapterNeeded = false;
-		actAdapter = null;
 		imRunner = !isThereARunner();
-		broadcastReceiver = createBroadcastReceiver();
 	}
 	
 	public Group(SeekerAdapter adapter) {
 		people = new ArrayList<Seeker>();
 		seekerAdapter = adapter;
 		isSeekerAdapterNeeded = true;
-		actAdapter = null;
-		broadcastReceiver = createBroadcastReceiver();
 	}
 	
 	public Group(ArrayList<Seeker> people, SeekerAdapter adapter) {
@@ -54,13 +42,10 @@ public class Group /*implements Parcelable*/ {
 		this.seekerAdapter = adapter;
 		isSeekerAdapterNeeded = true;
 		imRunner = !isThereARunner();
-		broadcastReceiver = createBroadcastReceiver();
 	}
 	
 	public Group(ArrayList<Seeker> people, ActivityAdapter adapter) {
 		this.people = people;
-		seekerAdapter = null;
-		isSeekerAdapterNeeded = false;
 		actAdapter = adapter;
 		imRunner = !isThereARunner();
 	}
@@ -91,8 +76,20 @@ public class Group /*implements Parcelable*/ {
 		return broadcastReceiver;
 	}
 	
+	public boolean getImRunner() {
+		return imRunner;
+	}
+	
 	
 	// Setters and removers
+	public void clear() {
+		people.clear();
+		seekerAdapter = null;
+		isSeekerAdapterNeeded = false;
+		imRunner = true;
+		actAdapter = null;
+	}
+	
 	public void setSeekerAdapter(SeekerAdapter adapter) {
 		this.seekerAdapter = adapter;
 		isSeekerAdapterNeeded = true;
@@ -119,21 +116,82 @@ public class Group /*implements Parcelable*/ {
 		}
 	}
 	
-	private static void sendText(final SmsManager sm, final String number, final String content) {
+	private boolean personExists(String number) {
+		boolean exists = false;
+		for(Seeker person : people) {
+			if(person.getNumber() == number) {
+				exists = true;
+				break;
+			}
+		}
+		return exists;
+	}
+	
+	
+	// Texting
+	private static void sendText(final String number, final String content) {
 		new Thread() {
 			public void run() {
-				sm.sendTextMessage(number, null, content, null, null);
+				sm.sendTextMessage(number, null, Ref.CATCH_ME + content, null, null);
 			}
 		}.start();
 	}
 	
-	private static void sendTexts(final SmsManager sm, final ArrayList<String> numbers, final String content) {
+	private static void sendTexts(final ArrayList<String> numbers, final String content) {
 		new Thread() {
 			public void run() {
 				for(String number : numbers) {
-					sm.sendTextMessage(number, null, content, null, null);
+					sm.sendTextMessage(number, null, Ref.CATCH_ME + content, null, null);
 					try {
-						wait(500);
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}.start();
+	}
+	
+	private static void sendTexts(final ArrayList<String> numbers, final ArrayList<String> contents) {
+		new Thread() {
+			public void run() {
+				for(int i = 0; i < numbers.size(); i++) {
+					sm.sendTextMessage(numbers.get(i), null, Ref.CATCH_ME + contents.get(i), null, null);
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}.start();
+	}
+	
+	private static void sendTexts(final String number, final ArrayList<String> contents) {
+		new Thread() {
+			public void run() {
+				for(int i = 0; i < contents.size(); i++) {
+					sm.sendTextMessage(number, null, Ref.CATCH_ME + contents.get(i), null, null);
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						// Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}.start();
+	}
+	
+	private void sendEveryoneTexts(final String content) {
+		new Thread() {
+			public void run() {
+				for(Seeker person : people) {
+					sm.sendTextMessage(person.getNumber(), null, content, null, null);
+					try {
+						Thread.sleep(500);
 					} catch (InterruptedException e) {
 						// Auto-generated catch block
 						e.printStackTrace();
@@ -147,8 +205,8 @@ public class Group /*implements Parcelable*/ {
 	// Runner management
 	private boolean isThereARunner() {
 		boolean result = false;
-		for(Seeker seeker : people) {
-			if(seeker.isRunner()) {
+		for(Seeker person : people) {
+			if(person.isRunner()) {
 				result = true;
 				break;
 			}
@@ -158,6 +216,10 @@ public class Group /*implements Parcelable*/ {
 	
 	public void makeMeRunner() {
 		imRunner = true;
+	}
+	
+	public void makeMeNotRunner() {
+		imRunner = false;
 	}
 	
 	public void makeRunner(int index) {
@@ -195,11 +257,13 @@ public class Group /*implements Parcelable*/ {
 	
 	// Private Group management
 	private void createPerson(String name, String number) {
-		people.add(new Seeker(number, name));
-		notifyAdapter();
+		if(!personExists(number)) {
+			people.add(new Seeker(number, name));
+			notifyAdapter();
+		}
 	}
 	
-	private void removePerson(int index) {
+	public void removePerson(int index) {
 		people.remove(index);
 		notifyAdapter();
 	}
@@ -213,18 +277,13 @@ public class Group /*implements Parcelable*/ {
 		return;
 	}
 	
-	private String getNameByNum(String number) {
-		for(Seeker person : people) {
-			if(person.getNumber().equals(number) ) {
-				return person.getName();
-			}
-		}
-		return "Error";
-	}
-	
 	
 	// Public Group management -- Receive
 	public void receiveImIn(String name, String number) {
+		if(imRunner && !people.isEmpty()) {
+			sendTheyreIn(number);
+			sendHesIn(name, number);
+		}
 		createPerson(name, number);
 		actAdapter.receiveImIn(name, number);
 	}
@@ -233,32 +292,9 @@ public class Group /*implements Parcelable*/ {
 		removePersonByNumber(number);
 	}
 	
-	public void receiveYoureIn(String name, String number, final Context context) {
-		if(imRunner) {
-			
-		} else {
-			Ref.makeAlert("You're invited", name + " wants you to join their game",
-					new DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							Intent i = new Intent(context, SnitchMainPage.class);
-							context.startActivity(i);
-							Group.this.getActAdapter().end();
-							
-						}
-					}, "Okay", 
-					new DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							// TODO Auto-generated method stub
-							
-						}
-					}, "No, go away", context);
-		}
-		//Ref.joinGameAlert(name, number, context);
-		// TODO make text change when you have a group with you
+	public void receiveYoureIn(String name, String number, Context context) {
+		actAdapter.receiveYoureIn(name, number, context);
+		//Ref.joinGameAlert(name, number, context);\
 	}
 	
 	public void receiveYoureOut() {
@@ -281,29 +317,66 @@ public class Group /*implements Parcelable*/ {
 	
 	
 	// Public Group management -- Send
-	public void sendImOut(SmsManager sm) {
-		ArrayList<String> numbers = new ArrayList<String>();
+	public void sendImIn(Context context, String destinationNum) {
+		SharedPreferences sp = context.getSharedPreferences(Ref.STORED_PREFERENCES_KEY,
+															Context.MODE_PRIVATE);
+		String name = sp.getString(Ref.USERNAME_KEY, "Someone");
 		
-		for(Seeker person : people) {
-			if(person.isRunner()) {
-				numbers.add(person.getNumber());
-			}
+		sendText(destinationNum, Ref.IM_IN + name);
+		
+		// Add this if we want to merge groups
+		/*if(imRunner && !people.isEmpty()) {
+			sendTheyreIn(destinationNum);
+		}*/
+	}
+	
+	public void sendImOut() {
+		if(imRunner) {
+			sendText(people.get(0).getNumber(), Ref.YOURE_RUNNER);
+			imRunner = false;
 		}
 		
-		sendTexts(sm, numbers, Ref.CATCH_ME + Ref.IM_OUT);
+		sendEveryoneTexts(Ref.IM_OUT);
+		
+		// I'm not sure if this should be here or elsewhere...
+		// I'd probably forget it elsewhere, though.
+		this.clear();
+	}
+	
+	private void sendTheyreIn(String number) {
+		ArrayList<String> contents = new ArrayList<String>();
+		
+		for(Seeker person : people) {
+			contents.add(Ref.HES_IN + person.getName() + " " + person.getNumber());
+		}
+		
+		sendTexts(number, contents);
+	}
+	
+	private void sendHesIn(String name, String number) {
+		sendEveryoneTexts(Ref.HES_IN + name + " " + number);
+	}
+	
+	public void sendYoureOut(int index) {
+		sendText(people.get(index).getNumber(), Ref.YOURE_OUT);
+	}
+	
+	public void sendGameStart(int interval) {
+		sendEveryoneTexts(Ref.GAME_START + interval);
+	}
+	
+	public void sendGameOver() {
+		sendEveryoneTexts(Ref.GAME_OVER);
+	}
+	
+	public void sendGeopoint(String geopointString) {
+		sendEveryoneTexts(Ref.GEOPOINT + geopointString);
 	}
 	
 	
 	// Public static Group management -- Send
-	public static void sendImIn(Context context, SmsManager sm, String destinationNum) {
-		SharedPreferences sp = context.getSharedPreferences(Ref.STORED_PREFERENCES_KEY, Context.MODE_PRIVATE);
-		String name = sp.getString(Ref.USERNAME_KEY, "Someone");
-		sendText(sm, destinationNum, Ref.CATCH_ME + Ref.IM_IN + name);
-	}
+	// Empty at the moment
 	
-	public static void joinGame(Context context, SmsManager sm, String destinationNum) {
-		sendImIn(context, sm, destinationNum);
-	}
 	
 	// BroadcastReceiver creation
 	// Creates a BroadcastReceiver which ONLY parses information and then sends it to the
@@ -342,7 +415,7 @@ public class Group /*implements Parcelable*/ {
 					    		
 					    	} else if(message.contains(Ref.YOURE_IN)) {
 					    		name = message.replace(Ref.YOURE_IN, "");
-					    		Group.receiveYoureIn(name, number, context);
+					    		group.receiveYoureIn(name, number, context);
 					    		
 					    	} else if(message.contains(Ref.YOURE_OUT)) {
 					    		group.getActAdapter().receiveYoureOut();
@@ -386,7 +459,7 @@ public class Group /*implements Parcelable*/ {
 	
 	
 	//
-	//I'm just going to use a static group in Ref.java instead of working on this
+	//I'm just going to use a static group in Ref.java instead of working on this for now
 	//
 	
 	/* everything below here is for implementing Parcelable */
@@ -404,7 +477,8 @@ public class Group /*implements Parcelable*/ {
     	
     }
 
-    // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
+    // this is used to regenerate your object. All Parcelables must have a CREATOR
+    // that implements these two methods
     public static final Parcelable.Creator<Group> CREATOR = new Parcelable.Creator<Group>() {
         public Group createFromParcel(Parcel in) {
             return new Group(in);

@@ -19,9 +19,9 @@
 
     <!-- Main Page layout -->
     <string name="i_am">I am&#8230;</string>
-    <string name="seeker">a seeker</string>
-    <string name="snitch">the runner</string>
-    <string name="confused">confused</string>
+    <string name="join">Join group</string>
+    <string name="create">Create group</string>
+    <string name="confused">I\'m confused</string>
 
     <!-- Misc -->
     <string name="title_activity_seeker_map">SeekerMap</string>
@@ -29,7 +29,7 @@
     <string name="title_activity_seeker_waiting">SeekerWaitingActivity</string>
 
     <!-- Snitch Main Page layout -->
-    <string name="wait_for_seeker">Waiting for seekers&#8230;</string>
+    <string name="group">Group&#8230;</string>
     <string name="start">Start</string>
     <string name="settings">Change Interval (30 Sec)</string>
     <string name="seeker_name">Empty</string>

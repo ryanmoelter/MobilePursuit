@@ -6,15 +6,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.telephony.SmsManager;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
@@ -42,9 +37,9 @@ public class SeekerMainPage extends Activity implements OnClickListener{
 	
 	// Typeface only
 	Typeface light;
-	private TextView textTitle;
-	private TextView textOr;
-	private TextView textStartButton;
+	TextView textTitle, textOr, textStartButton;
+	
+	Group group;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,6 +66,14 @@ public class SeekerMainPage extends Activity implements OnClickListener{
         snitchContactPicker.setTypeface(light);
         box.setTypeface(light);
         
+        if(Ref.group != null) {
+        	group = Ref.group;
+        } else {
+        	group = new Group();
+        }
+        group.setActAdapter(new ActivityAdapter(group) {
+        	
+        });
     }
    
     @Override  
@@ -137,10 +140,10 @@ public class SeekerMainPage extends Activity implements OnClickListener{
 
     public String convertToOnlyNumbers(String number) {
     	return number.replace("(", "")
-					   .replace(")", "")
-					   .replace(" ", "")
-					   .replace("-", "")
-					   .replace("+", "");
+					 .replace(")", "")
+					 .replace(" ", "")
+					 .replace("-", "")
+					 .replace("+", "");
     }
     
     public boolean checkIfRealNumber(String number) {
@@ -151,42 +154,28 @@ public class SeekerMainPage extends Activity implements OnClickListener{
     	}
     	else if(length >= 10 && length <= 13) {
     		return true;
+    	} else {
+    		Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show();
     	}
     	return false;
-		/*if(snitchNumber.length() == 11) {
-		    return true;
-		} else if(snitchNumber.length() == 12) {
-		    return true;
-		} else if(snitchNumber.length() == 10) {
-		    return true;
-		} else if(snitchNumber.length() == 7) {
-		    return true;
-		} else {
-		    return false;
-		}*/
     }
     
 	public void onClick(View v) {
-		Intent seekerWaitIntent = new Intent(this, SeekerWaitingPage.class);
 		if (v.equals(findViewById(R.id.snitch_contact_picker))) {
 			Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI);
 			startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
 		} else if(v.equals(findViewById(R.id.start_button))) {
 			snitchNumber = box.getText().toString();
-			if(checkIfRealNumber(snitchNumber) == true) {
-				//defaultNumber stores the phone number to text. this is where you send out something to the snitch
-				SharedPreferences sp = getSharedPreferences(Ref.STORED_PREFERENCES_KEY, MODE_PRIVATE);
-				snitchNumber = convertToOnlyNumbers(snitchNumber);
-		    	String username = sp.getString(Ref.USERNAME_KEY, "Someone");
-				seekerWaitIntent.putExtra(Ref.SNITCH_NUMBER_KEY, snitchNumber);
-				sm.sendTextMessage(snitchNumber, null, Ref.IM_IN + username, null, null);
-				this.startActivity(seekerWaitIntent);
+			if(checkIfRealNumber(snitchNumber)) {
+//				defaultNumber stores the phone number to text. this is where you send out something to the snitch
+//				snitchNumber = convertToOnlyNumbers(snitchNumber);
+//				seekerWaitIntent.putExtra(Ref.SNITCH_NUMBER_KEY, snitchNumber);
+//				sm.sendTextMessage(snitchNumber, null, Ref.IM_IN + username, null, null);
+				group.sendImIn(this, snitchNumber);
+				Ref.group = group;
+				this.startActivity(new Intent(this, SnitchMainPage.class));
 				finish();
-			} else {
-				Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show();
 			}
-
 		}
 	}
 }
-        
