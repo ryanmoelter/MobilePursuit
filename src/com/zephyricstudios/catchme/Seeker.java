@@ -1,6 +1,5 @@
 package com.zephyricstudios.catchme;
 
-import java.util.ArrayList;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -9,7 +8,7 @@ public class Seeker implements Parcelable {
 	private String mName, mNumber;
 	private boolean isRunner;
 	
-	public Seeker(String number, String name) {
+	public Seeker(String name, String number) {
 		mName = name;
 		mNumber = number;
 		isRunner = false;

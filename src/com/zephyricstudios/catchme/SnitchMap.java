@@ -99,61 +99,10 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         group = Ref.group;
         
         group.setActAdapter(new ActivityAdapter(group) {
-        	@Override
-        	public void receiveImOut(String name) {
-        		checkGameOver();
-        		if(isGameOver) {
-        			Toast.makeText(SnitchMap.this, name + " has left the game", Toast.LENGTH_LONG).show();
-        		}
-        	}
+        	// TODO Create an end method that's called when there are no more seekers
         });
         
         localTextReceiver = group.getBroadcastReceiver();
-        /*localTextReceiver = new BroadcastReceiver(){
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				Bundle bundle = intent.getExtras();
-
-				if (bundle != null) {
-				    Object[] pdusObj = (Object[]) bundle.get("pdus");
-				    SmsMessage[] messages = new SmsMessage[pdusObj.length];
-				    
-				    // getting SMS information from Pdu.
-				    for(int i = 0; i < pdusObj.length; i++) {
-				        messages[i] = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
-				    }
-
-				    for (SmsMessage currentMessage : messages) {
-				    	if(currentMessage.getDisplayMessageBody().contains(Ref.IM_OUT)){
-				    		//Context cont = getApplicationContext();
-				    		Seeker.deleteSeekerByNum(currentMessage.getDisplayOriginatingAddress(),
-				    				seekerArray);
-				    		CharSequence text = (Seeker.getSeekerNameByNum(
-				    				currentMessage.getDisplayOriginatingAddress(), seekerArray)
-				    				+ " has left the game.");
-				    		Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
-				    		toast.show();
-				    		
-				        	this.abortBroadcast();
-				        	SnitchMap.this.checkSeekerArrayEmpty();
-				        } else if(currentMessage.getDisplayMessageBody().contains(Ref.IM_IN)) {
-				        	String name = currentMessage.getMessageBody().replace(Ref.IM_IN, "");
-				        	String number = currentMessage.getDisplayOriginatingAddress();
-				        	Seeker.createSeeker(number,
-				        			name,
-				        			seekerArray);
-				        	Toast.makeText(SnitchMap.this,
-				        			name + " has joined the game",
-				        			Toast.LENGTH_SHORT).show();
-				        	sm.sendTextMessage(number, null, Ref.GAME_START + timerInterval, null, null);
-				        	this.abortBroadcast();
-				        }
-				           //currentMessage.getDisplayOriginatingAddress();		// has sender's phone number
-				           //currentMessage.getDisplayMessageBody();			// has the actual message
-				    }
-				}
-			}
-        };*/
         
         filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
@@ -170,21 +119,21 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         
 	}
 	
-	public void checkGameOver() {
-		if(group.getPeople().isEmpty()) {
-			isGameOver = false;
-			
-			Ref.makeAlert("Game Over", "Your friends have all left the game.", 
-					new DialogInterface.OnClickListener() {
-						
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							SnitchMap.this.finish();
-						}
-						
-					}, "Okay", this);
-		}
-	}
+//	public void checkGameOver() {
+//		if(group.getPeople().isEmpty()) {
+//			isGameOver = false;
+//			
+//			Ref.makeAlert("Game Over", "Your friends have all left the game.", 
+//					new DialogInterface.OnClickListener() {
+//						
+//						@Override
+//						public void onClick(DialogInterface dialog, int which) {
+//							SnitchMap.this.finish();
+//						}
+//						
+//					}, "Okay", this);
+//		}
+//	}
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -210,7 +159,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 		this.unregisterReceiver(this.localTextReceiver);
 		timer.cancel();
 		if(isGameOver) {
-			group.sendGameOver();
+			group.leaveGroup();
 		}
 		super.onDestroy();
 	}

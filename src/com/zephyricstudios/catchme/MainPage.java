@@ -13,7 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
-public class MainPage extends Activity implements OnClickListener {
+public class MainPage extends Activity implements OnClickListener, Endable {
 	
 	RelativeLayout buttonMainSnitch, buttonMainSeeker, buttonMainConfused;
 	TextView textMainSeeker, textMainSnitch, textMainConfused;
@@ -25,6 +25,7 @@ public class MainPage extends Activity implements OnClickListener {
 	
 	BroadcastReceiver localTextReceiver;
 	IntentFilter filter;
+	boolean navigated;
 	
 	Group group;
 	
@@ -44,15 +45,10 @@ public class MainPage extends Activity implements OnClickListener {
         	group = Ref.group;
         } else {
         	group = new Group();
+        	Ref.group = group;
         }
-        group.setActAdapter(new ActivityAdapter(group) {
-    		@Override
-    		public void end() {
-    			MainPage.this.unregisterReceiver(localTextReceiver);
-    			Ref.group = MainPage.this.group;
-    			// Do not end activity here
-    		}
-    	});
+        group.setActAdapter(new ActivityAdapter());
+        group.setRunning(this);
         
         textMainSeeker = (TextView)findViewById(R.id.text_main_seeker);
         textMainSnitch = (TextView)findViewById(R.id.text_main_snitch);
@@ -73,6 +69,7 @@ public class MainPage extends Activity implements OnClickListener {
         filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
+        navigated = false;
     }
     
     @Override
@@ -80,34 +77,43 @@ public class MainPage extends Activity implements OnClickListener {
     	this.unregisterReceiver(localTextReceiver);
     	super.onDestroy();
     }
+
+	@Override
+	public void end() {
+		navigated = true;
+		this.unregisterReceiver(localTextReceiver);
+		// Do not end activity here
+	}
+	
+	public void onReturn() {
+		this.registerReceiver(localTextReceiver, filter);
+		navigated = false;
+	}
     
     @Override
     protected void onRestart() {
-    	this.group = Ref.group;
-    	this.registerReceiver(localTextReceiver, filter);
+//    	this.group = Ref.group;
+    	if(navigated) {
+    		group.setActAdapter(new ActivityAdapter());  // It will have been replaced
+    		onReturn();
+    	}
     	super.onRestart();
     }
     
 	public void onClick(View buttonChosen) {
-		Intent i = null;
-		
 		switch (buttonChosen.getId()) {
 		case R.id.button_main_seeker:
-			i = new Intent(this, SeekerMainPage.class);
+			this.startActivity(new Intent(this, SeekerMainPage.class));
+			this.end();
 			break;
 		case R.id.button_main_snitch:
-			i = new Intent(this, SnitchMainPage.class);
-			//i.putParcelableArrayListExtra(Ref.SEEKER_ARRAY_KEY, seekerArray);
+			this.startActivity(new Intent(this, SnitchMainPage.class));
+			this.end();
 			break;
 		case R.id.button_main_confused:
-			i = new Intent(this, ConfusedMenu.class);
+			this.startActivity(new Intent(this, ConfusedMenu.class));
+			this.end();
 			break;
-		}
-		
-		if(i != null) {
-			Ref.group = this.group;
-			this.unregisterReceiver(localTextReceiver);
-			this.startActivity(i);
 		}
 	}
 }

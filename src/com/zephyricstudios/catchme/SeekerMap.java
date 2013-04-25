@@ -15,16 +15,11 @@ import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.telephony.SmsManager;
-import android.telephony.SmsMessage;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -70,9 +65,11 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 		mapView.setBuiltInZoomControls(false); 
 		myLocationOverlay = new MyLocationOverlay(this, mapView);
         itemizedOverlay = new MapsItemizedOverlay(
-        		this.getResources().getDrawable(R.drawable.map_marker_grey), this);
+        					  this.getResources().getDrawable(
+        					  R.drawable.map_marker_grey), this);
         newestOverlay = new MapsItemizedOverlay(
-        		this.getResources().getDrawable(R.drawable.map_marker), this);
+        					this.getResources().getDrawable(
+        					R.drawable.map_marker), this);
 		mapOverlays = mapView.getOverlays();
         mapOverlays.add(myLocationOverlay);
 		mapController = mapView.getController();
@@ -94,21 +91,39 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         
         secondCounter = 0;
         
-        if(Ref.group != null) {
+//        if(Ref.group != null) {
         	group = Ref.group;
-        } else {
-        	group = new Group();
-        }
+//        } else {
+//        	group = new Group();
+//        }
         
         group.setActAdapter(new ActivityAdapter(group) {
         	// put stuff in here
         	@Override
+        	public void receiveGeopoint(String geoString) {
+        		if(geoString.contains("null")) {
+        			Toast.makeText(SeekerMap.this,
+        						   "The runner's location could not be found",
+        						   Toast.LENGTH_LONG).show();
+        		} else {
+            		addMarker(Ref.stringToGeoPoint(geoString));
+        		}
+        		resetCounter(); //Reset the timer
+        	}
+        	
+        	@Override
         	public void receiveGameOver() {
         		imOut = false;
-        		Ref.group = group;
-        		Ref.game = game;
+//        		Ref.group = group;
+//        		Ref.game = game;
     			startActivity(new Intent(SeekerMap.this, GameOverPage.class));
     			SeekerMap.this.finish();
+        	}
+        	
+        	@Override
+        	public void end() {
+        		imOut = true;
+        		SeekerMap.this.finish();
         	}
         });
         
@@ -186,6 +201,12 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 				});				
 			}
 		}).start(); */
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		// TODO startupCenterOnCurrent();
 	}
 	
 	@Override

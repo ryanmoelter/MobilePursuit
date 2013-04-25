@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.telephony.SmsManager;
 import android.view.KeyEvent;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -21,7 +20,7 @@ import android.widget.ListView;
 
 import com.zephyricstudios.catchme.SeekerAdapter;
 
-public class SnitchMainPage extends Activity implements OnClickListener{
+public class SnitchMainPage extends Activity implements OnClickListener, Endable {
 	
 	RelativeLayout start;
 	RelativeLayout settings;
@@ -38,7 +37,7 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 	
 	TextView title, startText, textSnitchSettings, textSending;
 	
-	boolean intervalSettingsVisible, leaving = false;
+	boolean intervalSettingsVisible, navigating = false;
 	
 	RelativeLayout sendingLayout;
 	LinearLayout intervalSettings;
@@ -78,61 +77,26 @@ public class SnitchMainPage extends Activity implements OnClickListener{
         	group = new Group();
         }
         
-        group.setActAdapter(new ActivityAdapter(group) {
-        	@Override
-        	public void receiveYoureIn(String name, final String number, final Context context) {
-        		if(group.getImRunner()) {
-        			Ref.makeAlert("You're invited", name + " wants you to join their game. This "
-        					+ "will abandon the current group.",
-        					new DialogInterface.OnClickListener() { // Positive
-        						
-        						@Override
-        						public void onClick(DialogInterface dialog, int which) {
-        							group.sendImIn(context, number);
-        							group.sendImOut();
-        							Intent i = new Intent(context, SnitchMainPage.class);
-        							context.startActivity(i);
-        							group.getActAdapter().end();
-        							
-        						}
-        					}, "Okay", 
-        					new DialogInterface.OnClickListener() { // Negative
-        						
-        						@Override
-        						public void onClick(DialogInterface dialog, int which) {}
-        						
-        					}, "No, go away", context);
-        		} else {
-        			Ref.makeAlert("You're invited", name + " wants you to join their game.",
-        					new DialogInterface.OnClickListener() { // Positive
-        						
-        						@Override
-        						public void onClick(DialogInterface dialog, int which) {
-        							group.sendImIn(context, number);
-        							Intent i = new Intent(context, SnitchMainPage.class);
-        							context.startActivity(i);
-        							group.getActAdapter().end();
-        							
-        						}
-        					}, "Okay", 
-        					new DialogInterface.OnClickListener() { // Negative
-        						
-        						@Override
-        						public void onClick(DialogInterface dialog, int which) {}
-        						
-        					}, "No, go away", context);
-        		}
-        	}
+        group.setActAdapter(new ActivityAdapter() {
         	
         	@Override
         	public void receiveGameStart(int interval) {
         		game.setInterval(interval);
         		Ref.group = group;
         		Ref.game = game;
-        		leaving = true;
-        		SnitchMainPage.this.finish();
+        		SnitchMainPage.this.end();
+        	}
+        	
+        	@Override
+        	public void updateUI() {
+        		if(group.imRunner()) {
+        			SnitchMainPage.this.makeMeRunner();
+        		} else {
+        			SnitchMainPage.this.makeMeSeeker();
+        		}
         	}
         });
+        group.setRunning(this);
         
         group.setSeekerAdapter(new SeekerAdapter(this, R.layout.list_item, group.getPeople(), this, light));
         seekerList = (ListView)findViewById(R.id.seeker_list);
@@ -185,30 +149,24 @@ public class SnitchMainPage extends Activity implements OnClickListener{
     protected void onDestroy() {
     	this.unregisterReceiver(this.localTextReceiver);
     	group.disableSeekerAdapter();
-//    	if(!leaving) {
-//    		group.sendImOut();
-//    	}
+    	if(!navigating) {  // If you're not leaving on purpose, leave the group
+    					   // to avoid extra texts
+    		group.sendImOut();
+    	}
     	super.onDestroy();
     }
     
     public void onClick(View v){
-    	Intent i;
     	switch(v.getId()) {
     	case R.id.snitch_start_button:
     		if(!group.getPeople().isEmpty()){
-    			i = new Intent(this, SnitchMap.class);
-    			
     			group.sendGameStart(game.getInterval());
-    			
     			sendingLayout.setVisibility(View.VISIBLE);
-    			
-    			leaving = true;
-    			//i.putExtra(Ref.TIMER_INTERVAL_KEY, game.getInterval());
     			
     			Ref.group = group;
     			Ref.game = game;
-    			this.startActivity(i);
-    			finish();
+    			this.startActivity(new Intent(this, SnitchMap.class));
+    			end();
     		} else {
     			Toast.makeText(this, "At least one seeker is required to continue",
     					Toast.LENGTH_SHORT).show();
@@ -275,14 +233,11 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								group.sendImOut();
-								group.clear();
+								group.leaveGroup();
 								Ref.group = group;
-								leaving = true;
-								SnitchMainPage.this.finish();
+								SnitchMainPage.this.end();
 							}
-						}, 
-	        			"Yes", 
+						}, "Yes", 
 	        			new DialogInterface.OnClickListener() {
 
 							@Override
@@ -290,13 +245,26 @@ public class SnitchMainPage extends Activity implements OnClickListener{
 									int which) {
 								// Do nothing
 							}
-						}, 
-	        			"Nevermind", this);
+						}, "Nevermind", this);
 	        } else {
-	        	finish();
+	        	end();
 	        }
 	        return true;
 	     }
 	     return super.onKeyDown(keyCode, event);
+	}
+    
+    public void makeMeRunner() {
+    	// TODO makeMeRunner code, called from updateUI()
+    }
+    
+    public void makeMeSeeker() {
+    	// TODO makeMeSeeker code, called from updateUI()
+    }
+
+	@Override
+	public void end() {  // What to do when the activity is closing on purpose
+		navigating = true;
+		finish();
 	}
 }

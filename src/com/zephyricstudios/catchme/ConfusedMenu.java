@@ -2,15 +2,11 @@ package com.zephyricstudios.catchme;
 
 import android.os.Bundle;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.view.Menu;
+import android.content.IntentFilter;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.graphics.Typeface;
 
@@ -19,6 +15,10 @@ public class ConfusedMenu extends Activity implements OnClickListener {
 	TextView howToPlay, changeName, about;
 	Typeface light;
 	
+	Group group;
+	BroadcastReceiver localTextReceiver;
+	IntentFilter filter;
+	boolean navigated;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,31 +37,61 @@ public class ConfusedMenu extends Activity implements OnClickListener {
 		changeName.setOnClickListener(this);
 		about.setOnClickListener(this);
 		
+		group = Ref.group;
+		localTextReceiver = group.getBroadcastReceiver();
+		group.setActAdapter(makeActivityAdapter(group));
+		
+		filter = new IntentFilter();
+        filter.addAction(Ref.ACTION);
+        this.registerReceiver(this.localTextReceiver, filter);
+        navigated = false;
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		this.unregisterReceiver(localTextReceiver);
+	}
+	
+	@Override
+	protected void onRestart() {
+		super.onRestart();
+		if(navigated) {
+			group.setActAdapter(this.makeActivityAdapter(group));
+    		this.registerReceiver(localTextReceiver, filter);
+    		navigated = false;
+    	}
 	}
 
 	@Override
 	public void onClick(View chosen) {
-		Intent i = null;
-		boolean launch = false;
 		switch(chosen.getId()) {
 		case R.id.how_to_play:
-			i = new Intent(this, Confused.class); //old name for how to play
-			launch = true;
+			this.startActivity(new Intent(this, Confused.class)); //old name for how to play
 			break;
 		case R.id.about:
-			i = new Intent(this, About.class);
-			launch = true;
+			this.startActivity(new Intent(this, About.class));
 			break;
 		case R.id.change_name:
 			Ref.changeName(this, false);
-			launch = false;
 			break;
 		}
-		
-		if(launch) {
-			this.startActivity(i);
-		}
-		
 	}
-
+	
+	public void onNavigate() {
+		navigated = true;
+		this.unregisterReceiver(localTextReceiver);
+	}
+	
+	// Make the ActivityAdapter here so we can reconstruct it in onRestart(),
+	// since it will have been replaced by the ones in the game screens.
+	public ActivityAdapter makeActivityAdapter(Group group) {
+		return new ActivityAdapter(group) {
+			@Override
+    		public void end() {
+    			Ref.group = ConfusedMenu.this.group;
+    			ConfusedMenu.this.finish();
+    		}
+		};
+	}
 }

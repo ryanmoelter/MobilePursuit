@@ -20,7 +20,8 @@
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:allowBackup="true" >
         <uses-library android:name="com.google.android.maps" />
 
         <activity
@@ -55,11 +56,6 @@
         <activity
             android:name="com.zephyricstudios.catchme.SnitchMap"
             android:label="@string/title_activity_snitch_map"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name="com.zephyricstudios.catchme.SeekerWaitingPage"
-            android:label="@string/title_activity_seeker_waiting"
             android:screenOrientation="portrait" >
         </activity>
         <activity

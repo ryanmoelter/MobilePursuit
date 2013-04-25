@@ -6,8 +6,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.telephony.SmsManager;
 import android.view.View;
@@ -24,14 +26,14 @@ import android.widget.TextView;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;  
 
-public class SeekerMainPage extends Activity implements OnClickListener{
+public class SeekerMainPage extends Activity implements OnClickListener, Endable {
 
-	private Button snitchContactPicker;
-	private RelativeLayout startButton;
-	private EditText box;
-	private static final int CONTACT_PICKER_RESULT = 1001;
+	Button contactsButton;
+	RelativeLayout startButton;
+	EditText box;
+	static final int CONTACT_PICKER_RESULT = 1001;
 	String num = "";
-	String snitchNumber = "";
+	String runnerNumber = "";
 	SmsManager sm = SmsManager.getDefault();
 	Drawable drawable;
 	
@@ -40,6 +42,8 @@ public class SeekerMainPage extends Activity implements OnClickListener{
 	TextView textTitle, textOr, textStartButton;
 	
 	Group group;
+	BroadcastReceiver localTextReceiver;
+	IntentFilter filter;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,8 +52,8 @@ public class SeekerMainPage extends Activity implements OnClickListener{
         this.getResources().getDrawable(R.drawable.ic_launcher);
         
         //creates the contact picker that accesses numbers on the phone
-        snitchContactPicker = (Button)findViewById(R.id.snitch_contact_picker);
-        snitchContactPicker.setOnClickListener(this);
+        contactsButton = (Button)findViewById(R.id.snitch_contact_picker);
+        contactsButton.setOnClickListener(this);
         startButton = (RelativeLayout)findViewById(R.id.start_button);
         startButton.setOnClickListener(this);
         box = (EditText)findViewById(R.id.snitch_num);
@@ -63,18 +67,29 @@ public class SeekerMainPage extends Activity implements OnClickListener{
         textOr.setTypeface(light);
         textStartButton = (TextView)findViewById(R.id.text_seeker_continue);
         textStartButton.setTypeface(light);
-        snitchContactPicker.setTypeface(light);
+        contactsButton.setTypeface(light);
         box.setTypeface(light);
         
-        if(Ref.group != null) {
-        	group = Ref.group;
-        } else {
-        	group = new Group();
-        }
-        group.setActAdapter(new ActivityAdapter(group) {
-        	
-        });
+        group = Ref.group;
+        group.setActAdapter(new ActivityAdapter());
+        group.setRunning(this);
+        
+        localTextReceiver = group.getBroadcastReceiver();
+        filter = new IntentFilter();
+        filter.addAction(Ref.ACTION);
+        this.registerReceiver(this.localTextReceiver, filter);
     }
+    
+    @Override
+    protected void onDestroy() {
+    	super.onDestroy();
+    	SeekerMainPage.this.unregisterReceiver(localTextReceiver);
+    }
+
+	@Override
+	public void end() {
+		finish();
+	}
    
     @Override  
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {  
@@ -111,20 +126,20 @@ public class SeekerMainPage extends Activity implements OnClickListener{
                     builder.setTitle("Choose a number");
                     builder.setItems(items, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int item) {
-                            snitchNumber = items[item].toString();
+                            runnerNumber = items[item].toString();
                             //selectedNumber = selectedNumber.replace("-", "");
                             //num = selectedNumber;
-                            phoneInput.setText(snitchNumber);
+                            phoneInput.setText(runnerNumber);
                         }
                     });
                     AlertDialog alert = builder.create();
                     if(allNumbers.size() > 1) {
                         alert.show();
                     } else {
-                        snitchNumber = phoneNumber.toString();
+                        runnerNumber = phoneNumber.toString();
                         //selectedNumber = selectedNumber.replace("-", "");
                         //num = selectedNumber;
-                        phoneInput.setText(snitchNumber);
+                        phoneInput.setText(runnerNumber);
                     }
 
                     if (phoneNumber.length() == 0) {  
@@ -160,22 +175,21 @@ public class SeekerMainPage extends Activity implements OnClickListener{
     	return false;
     }
     
-	public void onClick(View v) {
-		if (v.equals(findViewById(R.id.snitch_contact_picker))) {
+	public void onClick(View chosen) {
+		switch(chosen.getId()) {
+		case R.id.snitch_contact_picker:
 			Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI);
 			startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
-		} else if(v.equals(findViewById(R.id.start_button))) {
-			snitchNumber = box.getText().toString();
-			if(checkIfRealNumber(snitchNumber)) {
-//				defaultNumber stores the phone number to text. this is where you send out something to the snitch
-//				snitchNumber = convertToOnlyNumbers(snitchNumber);
-//				seekerWaitIntent.putExtra(Ref.SNITCH_NUMBER_KEY, snitchNumber);
-//				sm.sendTextMessage(snitchNumber, null, Ref.IM_IN + username, null, null);
-				group.sendImIn(this, snitchNumber);
-				Ref.group = group;
-				this.startActivity(new Intent(this, SnitchMainPage.class));
-				finish();
+			break;
+			
+		case R.id.start_button:
+			runnerNumber = box.getText().toString();
+			
+			if(checkIfRealNumber(runnerNumber)) {
+				runnerNumber = convertToOnlyNumbers(runnerNumber);
+				group.joinGroup(runnerNumber, this);
 			}
+			break;
 		}
 	}
 }

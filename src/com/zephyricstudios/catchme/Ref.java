@@ -34,8 +34,8 @@ public class Ref {
 	public static final String YOURE_OUT = "You're out";
 	public static final String HES_IN = "He's in. ";
 	public static final String HES_OUT = "He's out. ";
-	public static final String YOURE_RUNNER = "You're runner";
 	public static final String IM_RUNNER = "I'm runner";
+	public static final String YOURE_RUNNER = "You're runner";
 	public static final String GEOPOINT = "gp: ";
 	public static final String GAME_START = "Start game. ";
 	public static final String GAME_OVER = "Game over";
