@@ -32,7 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class SeekerMap extends MapActivity implements OnClickListener {
+public class SeekerMap extends MapActivity implements OnClickListener, Endable {
 	
 	ArrayList<GeoPoint> geoPoints = new ArrayList<GeoPoint>(); // used to dynamically store geopoints
 	
@@ -43,7 +43,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	MapsItemizedOverlay itemizedOverlay, newestOverlay;
 	
 	int markerCounter, secondCounter, displayMinutes, displaySeconds, countdownSeconds;
-	boolean findMe, imOut;
+	boolean findMe, navigating;
 	
 	Timer timer;
 	
@@ -80,7 +80,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         mapView.postInvalidate();
         
         findMe = true;
-        imOut = true;
+        navigating = false;
         
         timer = new Timer();
         timer.schedule(new SeekerTimerTask(), 0, 1000);
@@ -91,13 +91,9 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         
         secondCounter = 0;
         
-//        if(Ref.group != null) {
-        	group = Ref.group;
-//        } else {
-//        	group = new Group();
-//        }
+        group = Ref.group;
         
-        group.setActAdapter(new ActivityAdapter(group) {
+        group.setActAdapter(new ActivityAdapter() {
         	// put stuff in here
         	@Override
         	public void receiveGeopoint(String geoString) {
@@ -113,19 +109,16 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         	
         	@Override
         	public void receiveGameOver() {
-        		imOut = false;
 //        		Ref.group = group;
 //        		Ref.game = game;
     			startActivity(new Intent(SeekerMap.this, GameOverPage.class));
-    			SeekerMap.this.finish();
+    			SeekerMap.this.end();
         	}
         	
-        	@Override
-        	public void end() {
-        		imOut = true;
-        		SeekerMap.this.finish();
-        	}
+        	
         });
+        
+        group.setRunning(this);
         
         game = Ref.game;
         
@@ -155,7 +148,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 				        		this.abortBroadcast();
 				        	}else if(currentMessage.getDisplayMessageBody().contains(Ref.GEOPOINT)){
 				        		String geoStringTemp = currentMessage.getDisplayMessageBody()
-				        		.replace(Ref.GEOPOINT, "");
+				        							   .replace(Ref.GEOPOINT, "");
 				        		GeoPoint geoPointTemp = Ref.stringToGeoPoint(geoStringTemp);								
 				        		
 				        		addMarker(geoPointTemp);
@@ -163,7 +156,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 				        		
 				        		this.abortBroadcast();
 				        	}else if(currentMessage.getDisplayMessageBody().contains(Ref.GAME_OVER)){
-				        		imOut = false;
+				        		navigating = false;
 			        			Intent i = new Intent(context, GameOverPage.class);
 			        			startActivity(i);
 			        			this.abortBroadcast();
@@ -190,13 +183,14 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 					/*try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
+						// Auto-generated catch block
 						e.printStackTrace();
 					}* /
 				}
 				SeekerMap.this.runOnUiThread(new Runnable {
 					public void run() {
 						centerOnCurrent();
+						mapController.setZoom(20);
 					}
 				});				
 			}
@@ -237,9 +231,15 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	}
 	
 	@Override
+	public void end() {
+		navigating = true;
+		finish();
+	}
+	
+	@Override
 	protected void onDestroy() {
 		this.unregisterReceiver(this.localTextReceiver);
-		if(imOut) {
+		if(!navigating) {
 			group.sendImOut();
 		}
 		super.onDestroy();
@@ -249,7 +249,6 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 	protected void onRestart(){
 		super.onRestart();
     	myLocationOverlay.enableMyLocation();
-
 	}
 
 	@Override
@@ -270,7 +269,8 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							SeekerMap.this.finish();
+							group.leaveGroup();
+							end();
 						}
 						
 					}, "Yes",
@@ -280,30 +280,6 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 						public void onClick(DialogInterface dialog, int which) {}
 						
 					}, "Nevermind", this);
-
-//			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-//	        alertDialog.setTitle("Leave Game?");
-//	        alertDialog.setIcon(R.drawable.ic_launcher);
-//
-//	        alertDialog.setMessage("Do you want to leave the game?");
-//	        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
-//	        	new DialogInterface.OnClickListener() {
-//	        		public void onClick(DialogInterface dialog, int which) {
-//	        			// moved to onStop()
-//	        			//sendImOut();
-//	        		
-//	        			finish();
-//	        			return;
-//	        		}
-//	        	}); 
-//	        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No",
-//	        	new DialogInterface.OnClickListener() {
-//	        		public void onClick(DialogInterface dialog, int which) {
-//	        			dialog.cancel();
-//	        			return;
-//	        		}
-//	        	}); 
-//	        alertDialog.show();
 
 	        return true;
 	     }
