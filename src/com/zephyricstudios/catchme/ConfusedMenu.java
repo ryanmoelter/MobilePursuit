@@ -10,7 +10,7 @@ import android.view.View.OnClickListener;
 import android.widget.TextView;
 import android.graphics.Typeface;
 
-public class ConfusedMenu extends Activity implements OnClickListener {
+public class ConfusedMenu extends Activity implements OnClickListener, Endable {
 	
 	TextView howToPlay, changeName, about;
 	Typeface light;
@@ -39,7 +39,8 @@ public class ConfusedMenu extends Activity implements OnClickListener {
 		
 		group = Ref.group;
 		localTextReceiver = group.getBroadcastReceiver();
-		group.setActAdapter(makeActivityAdapter(group));
+		group.setActAdapter(new ActivityAdapter());
+		group.setRunning(this);
 		
 		filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
@@ -57,7 +58,7 @@ public class ConfusedMenu extends Activity implements OnClickListener {
 	protected void onRestart() {
 		super.onRestart();
 		if(navigated) {
-			group.setActAdapter(this.makeActivityAdapter(group));
+			group.setActAdapter(new ActivityAdapter());
     		this.registerReceiver(localTextReceiver, filter);
     		navigated = false;
     	}
@@ -78,20 +79,8 @@ public class ConfusedMenu extends Activity implements OnClickListener {
 		}
 	}
 	
-	public void onNavigate() {
+	public void end() {
 		navigated = true;
 		this.unregisterReceiver(localTextReceiver);
-	}
-	
-	// Make the ActivityAdapter here so we can reconstruct it in onRestart(),
-	// since it will have been replaced by the ones in the game screens.
-	public ActivityAdapter makeActivityAdapter(Group group) {
-		return new ActivityAdapter(group) {
-			@Override
-    		public void end() {
-    			Ref.group = ConfusedMenu.this.group;
-    			ConfusedMenu.this.finish();
-    		}
-		};
 	}
 }

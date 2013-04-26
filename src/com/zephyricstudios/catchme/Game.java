@@ -7,10 +7,8 @@ package com.zephyricstudios.catchme;
 public class Game {
 	
 	private int timerInterval;
-	private Group group;
 	
-	public Game(Group group) {
-		this.group = group;
+	public Game() {
 		timerInterval = 30;
 	}
 	

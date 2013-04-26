@@ -11,7 +11,7 @@ import android.widget.TextView;
 import android.widget.RelativeLayout;
 import android.graphics.Typeface;
 
-public class GameOverPage extends Activity implements OnClickListener {
+public class GameOverPage extends Activity implements OnClickListener, Endable {
 	
 	RelativeLayout buttonPlayAgain;
 	
@@ -42,22 +42,23 @@ public class GameOverPage extends Activity implements OnClickListener {
 		
 		group = Ref.group;
 		localTextReceiver = group.getBroadcastReceiver();
-		group.setActAdapter(new ActivityAdapter(group) {
-			@Override
-			public void end() {
-				GameOverPage.this.finish();
-			}
-		});
+		group.setActAdapter(new ActivityAdapter());
+		group.setRunning(this);
 		
 		filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
 	}
+	
+	@Override
+	public void end() {
+		finish();
+	}
 
 	public void onClick(View clicked) {
 		if(clicked.getId() == R.id.button_play_again){
-			this.startActivity(new Intent(this, SnitchMainPage.class));
-			finish();
+			startActivity(new Intent(this, SnitchMainPage.class));
+			end();
 		}
 	}
 

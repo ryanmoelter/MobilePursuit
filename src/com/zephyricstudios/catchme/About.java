@@ -7,7 +7,7 @@ import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.widget.TextView;
 
-public class About extends Activity {
+public class About extends Activity implements Endable {
 	
 	TextView zephyric, email, please, credits, mazen, mazenCredits, everyone, everyoneCredits;
 	Typeface light, thin;
@@ -37,7 +37,8 @@ public class About extends Activity {
 		everyone.setTypeface(light);
 		
 		group = Ref.group;
-		group.setActAdapter(makeActivityAdapter(group));
+		group.setActAdapter(new ActivityAdapter());
+		group.setRunning(this);
 		
 		localTextReceiver = group.getBroadcastReceiver();
 		filter = new IntentFilter();
@@ -56,27 +57,15 @@ public class About extends Activity {
 	protected void onRestart() {
 		super.onRestart();
 		if(navigated) {
-			group.setActAdapter(this.makeActivityAdapter(group));
+			group.setActAdapter(new ActivityAdapter());
     		this.registerReceiver(localTextReceiver, filter);
     		navigated = false;
     	}
 	}
 	
-	public void onNavigate() {
+	@Override
+	public void end() {
 		navigated = true;
 		this.unregisterReceiver(localTextReceiver);
-	}
-	
-	// Make the ActivityAdapter here so we can reconstruct it in onRestart(),
-	// since it will have been replaced by the ones in the game screens.
-	public ActivityAdapter makeActivityAdapter(Group group) {
-		return new ActivityAdapter(group) {
-			@Override
-    		public void end() {
-    			Ref.group = About.this.group;
-    			About.this.onNavigate();
-    			// Do not end activity here
-    		}
-		};
 	}
 }

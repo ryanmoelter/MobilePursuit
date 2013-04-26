@@ -28,6 +28,7 @@ public class MainPage extends Activity implements OnClickListener, Endable {
 	boolean navigated;
 	
 	Group group;
+	Game game;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,14 @@ public class MainPage extends Activity implements OnClickListener, Endable {
         }
         group.setActAdapter(new ActivityAdapter());
         group.setRunning(this);
+        group.setInGame(false);
+        
+        if(Ref.game != null) {
+        	game = Ref.game;
+        } else {
+        	game = new Game();
+        	Ref.game = game;
+        }
         
         textMainSeeker = (TextView)findViewById(R.id.text_main_seeker);
         textMainSnitch = (TextView)findViewById(R.id.text_main_snitch);
@@ -88,6 +97,7 @@ public class MainPage extends Activity implements OnClickListener, Endable {
 	public void onReturn() {
 		this.registerReceiver(localTextReceiver, filter);
 		navigated = false;
+		group.setInGame(false);
 	}
     
     @Override

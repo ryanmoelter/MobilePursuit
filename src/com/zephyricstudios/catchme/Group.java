@@ -15,12 +15,24 @@ import android.widget.Toast;
 public class Group /*implements Parcelable*/ {
 	private ArrayList<Seeker> people;
 	private SeekerAdapter seekerAdapter;
-	private boolean isSeekerAdapterNeeded = false, imRunner = true, inGame = false;
+	private boolean isSeekerAdapterNeeded = false, imRunner = true, inGame = false, joinedSomeone = false;
 	private ActivityAdapter actAdapter;
 	private BroadcastReceiver broadcastReceiver = createBroadcastReceiver();
 	private static SmsManager sm = SmsManager.getDefault();
 	private Endable running;
+	private Context context;  // TODO make this a thing. Otherwise, you can't make alerts.
 //	private String myName;
+	
+	/* TODO
+	 *  This shouldn't be here probably, but we need to figure out a way to chain multiple
+	 *  text message sendings. I feel like sleeping the main thread is a bad idea, and I just
+	 *  feel like there's a better way to do things. Maybe make an array of runnables? Maybe
+	 *  have all of the sending methods return a runnable, and just call a sendTexts method
+	 *  that strings them all together? That actually could work... Or maybe there's a better
+	 *  way than using runnables? Maybe have them return an array of numbers and contents? Or
+	 *  have them return an array of textMessage objects?
+	 *  Also, if/when this does happen, don't forget to put 500ms of delay between the messages.
+	 */
 	
 	
 	/*
@@ -31,6 +43,7 @@ public class Group /*implements Parcelable*/ {
 	 */
 	public Group() {
 		people = new ArrayList<Seeker>();
+		imRunner = true;
 	}
 	
 	public Group(Seeker person) {
@@ -135,6 +148,14 @@ public class Group /*implements Parcelable*/ {
 	
 	public void setRunning(Endable endable) {
 		running = endable;
+	}
+	
+	public void setInGame(boolean inGame) {
+		this.inGame = inGame;
+	}
+	
+	public void setContext(Context context) {
+		this.context = context;
 	}
 	
 	
@@ -494,6 +515,7 @@ public class Group /*implements Parcelable*/ {
 			context.startActivity(new Intent(context, SnitchMainPage.class));
 			running.end();
 		}
+		joinedSomeone = true;
 	}
 	
 	public void leaveGroup() {

@@ -64,18 +64,21 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
         settings = (RelativeLayout)findViewById(R.id.snitch_settings_button);
         settings.setOnClickListener(this);
         
-        // Seeker Array stuff
-        //seekerArray = this.getIntent().getExtras().getParcelableArrayList(Ref.SEEKER_ARRAY_KEY);
+        // Typeface
+        light = Typeface.createFromAsset(getAssets(), "roboto_light.ttf");
+        title = (TextView)findViewById(R.id.text_snitch_title);
+        title.setTypeface(light);
+        startText = (TextView)findViewById(R.id.text_snitch_start);
+        startText.setTypeface(light);
+        textSending = (TextView)findViewById(R.id.text_sending);
+        textSending.setTypeface(light);
+        
         /*if(this.getIntent().getExtras().getParcelable(Ref.GROUP_KEY) != null) {
         	group = this.getIntent().getExtras().getParcelable(Ref.GROUP_KEY);
         } else {
         	group = new Group();
         }*/
-        if(Ref.group != null) {
-        	group = Ref.group;
-        } else {
-        	group = new Group();
-        }
+        group = Ref.group;
         
         group.setActAdapter(new ActivityAdapter() {
         	
@@ -97,6 +100,7 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
         	}
         });
         group.setRunning(this);
+        group.setInGame(true);
         
         group.setSeekerAdapter(new SeekerAdapter(this, R.layout.list_item, group.getPeople(), this, light));
         seekerList = (ListView)findViewById(R.id.seeker_list);
@@ -105,17 +109,9 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
         if(Ref.game != null) {
         	game = Ref.game;
         } else {
-        	game = new Game(group);
+        	game = new Game();
+        	Ref.game = game;
         }
-        
-        // Typeface
-        light = Typeface.createFromAsset(getAssets(), "roboto_light.ttf");
-        title = (TextView)findViewById(R.id.text_snitch_title);
-        title.setTypeface(light);
-        startText = (TextView)findViewById(R.id.text_snitch_start);
-        startText.setTypeface(light);
-        textSending = (TextView)findViewById(R.id.text_sending);
-        textSending.setTypeface(light);
         
         intervalSettings = (LinearLayout)findViewById(R.id.interval_settings_layout);
         intervalSettings.setVisibility(View.GONE);
@@ -234,7 +230,6 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
 							public void onClick(DialogInterface dialog,
 									int which) {
 								group.leaveGroup();
-								Ref.group = group;
 								SnitchMainPage.this.end();
 							}
 						}, "Yes", 

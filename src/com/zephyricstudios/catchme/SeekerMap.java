@@ -108,8 +108,6 @@ public class SeekerMap extends MapActivity implements OnClickListener, Endable {
         	
         	@Override
         	public void receiveGameOver() {
-//        		Ref.group = group;
-//        		Ref.game = game;
     			startActivity(new Intent(SeekerMap.this, GameOverPage.class));
     			SeekerMap.this.end();
         	}

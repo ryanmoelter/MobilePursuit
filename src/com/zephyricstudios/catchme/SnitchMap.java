@@ -31,7 +31,7 @@ import android.widget.Toast;
 
 import android.graphics.Typeface;
 
-public class SnitchMap extends MapActivity implements OnClickListener {
+public class SnitchMap extends MapActivity implements OnClickListener, Endable {
 	
 	ArrayList<GeoPoint> geoPoints = new ArrayList<GeoPoint>(); // used to dynamically store geopoints
 	
@@ -48,7 +48,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	
 	RelativeLayout buttonSnitchTagged;
 	
-	boolean mapExpanded, isGameOver;
+	boolean mapExpanded, navigating;
 	
 	// Typeface
 	Typeface thin, light;
@@ -76,9 +76,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         mapOverlays.add(myLocationOverlay);
         
         snitchTimer = (TextView)findViewById(R.id.snitch_timer);
-        //seekerArray = this.getIntent().getExtras().getParcelableArrayList(Ref.SEEKER_ARRAY_KEY);
         secondCounter = 0;
-        //timerInterval = this.getIntent().getExtras().getInt(Ref.TIMER_INTERVAL_KEY);
         
         timer = new Timer();
         timer.schedule(new SnitchTimerTask(), 0, 1000);
@@ -87,7 +85,7 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         buttonSnitchTagged.setOnClickListener(this);
         
         mapExpanded = false;
-        isGameOver = true;
+        navigating = false;
         
         // Typeface
         thin = Typeface.createFromAsset(getAssets(), "roboto_thin.ttf");
@@ -96,44 +94,18 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         textTagged = (TextView)findViewById(R.id.text_snitch_tagged);
         textTagged.setTypeface(light);
         
+        game = Ref.game;
         group = Ref.group;
         
-        group.setActAdapter(new ActivityAdapter(group) {
-        	// TODO Create an end method that's called when there are no more seekers
-        });
+        group.setActAdapter(new ActivityAdapter());
+        group.setRunning(this);
         
         localTextReceiver = group.getBroadcastReceiver();
         
         filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
-        
-        /*sendTexts = new Thread() {
-        	public void run() {
-        		for(int index = 0; seekerArray.size() > index; index++) {
-    				sm.sendTextMessage(seekerArray.get(index).getNumber(), null, textContent, null, null);
-    				
-    			}
-        	}
-        };*/
-        
 	}
-	
-//	public void checkGameOver() {
-//		if(group.getPeople().isEmpty()) {
-//			isGameOver = false;
-//			
-//			Ref.makeAlert("Game Over", "Your friends have all left the game.", 
-//					new DialogInterface.OnClickListener() {
-//						
-//						@Override
-//						public void onClick(DialogInterface dialog, int which) {
-//							SnitchMap.this.finish();
-//						}
-//						
-//					}, "Okay", this);
-//		}
-//	}
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -154,11 +126,17 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	}
 	
 	@Override
+	public void end() {
+		navigating = true;
+		finish();
+	}
+	
+	@Override
 	protected void onDestroy() {
 		myLocationOverlay.disableMyLocation();
 		this.unregisterReceiver(this.localTextReceiver);
 		timer.cancel();
-		if(isGameOver) {
+		if(!navigating) {
 			group.leaveGroup();
 		}
 		super.onDestroy();
@@ -203,9 +181,11 @@ public class SnitchMap extends MapActivity implements OnClickListener {
         @Override
         public void run() {
         	if(secondCounter >= game.getInterval()){
-        		group.sendGeopoint(String.valueOf(myLocationOverlay.getMyLocation()));
-//        		textContent = Ref.GEOPOINT + String.valueOf(myLocationOverlay.getMyLocation());
-//        		sendTexts();
+        		if(myLocationOverlay.getMyLocation() == null) {
+        			group.sendGeopoint(null);
+        		} else {
+        			group.sendGeopoint(String.valueOf(myLocationOverlay.getMyLocation()));
+        		}
         		
         		secondCounter = 0;
         	}
@@ -223,9 +203,9 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 	}
 	
 	public void endGame() {
-		Intent i = new Intent(this, GameOverPage.class);
-		startActivity(i);
-		finish();
+		group.sendGameOver();
+		startActivity(new Intent(this, GameOverPage.class));
+		end();
 	}
 	
 	public void showEndGameAlert() {
@@ -243,32 +223,6 @@ public class SnitchMap extends MapActivity implements OnClickListener {
 					public void onClick(DialogInterface dialog, int which) {}
 					
 				}, "Nevermind", this);
-		
-		
-		/*AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle("End game?");
-        alertDialog.setIcon(R.drawable.ic_launcher);
-
-        alertDialog.setMessage("Do you want to end the game?");
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
-        	public void onClick(DialogInterface dialog, int which) {
-        		//textContent = Ref.GAME_OVER;
-        		//sendTexts();
-        		
-        		//myLocationOverlay.disableMyLocation();
-        		//timer.cancel();
-        		
-        		endGame();
-        		return;
-        	}
-        }); 
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
-        	public void onClick(DialogInterface dialog, int which) {
-        		dialog.cancel();
-        		return;
-            }
-        }); 
-        alertDialog.show();*/
 	}
 	
 	public void centerOnMe() {
