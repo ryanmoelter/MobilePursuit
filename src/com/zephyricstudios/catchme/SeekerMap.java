@@ -34,7 +34,8 @@ import android.widget.Toast;
 
 public class SeekerMap extends MapActivity implements OnClickListener, Endable {
 	
-	ArrayList<GeoPoint> geoPoints = new ArrayList<GeoPoint>(); // used to dynamically store geopoints
+	ArrayList<GeoPoint> geoPoints = new ArrayList<GeoPoint>();
+		// used to dynamically store geopoints
 	
 	MapView mapView;
 	MapController mapController;
@@ -73,8 +74,6 @@ public class SeekerMap extends MapActivity implements OnClickListener, Endable {
 		mapOverlays = mapView.getOverlays();
         mapOverlays.add(myLocationOverlay);
 		mapController = mapView.getController();
-		//mapController.setZoom(20);
-		//mapController.animateTo(myLocationOverlay.getMyLocation());
         markerCounter = 0;
         seekerTimer = (TextView)findViewById(R.id.seeker_timer);
         mapView.postInvalidate();
