@@ -336,7 +336,8 @@ public class Group /*implements Parcelable*/ {
 						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {  // Positive
-							createPerson(name, number);
+//							createPerson(name, number);
+							// ^ This isn't necessary, since the runner will return it with an I'm in
 							sendImIn(number);
 							sendImRunner(number);
 //							makeMeRunner();   not necessary
@@ -455,7 +456,7 @@ public class Group /*implements Parcelable*/ {
 	
 	public void receiveImRunner(String number) {
 		if(inGame) {
-			if(imRunner) {  // Glitch
+			if(imRunner) {  // This is a glitch
 				// Do nothing
 			} else {  // There's a new runner. Make them the runner (in data)
 				clearRunners();
@@ -505,12 +506,13 @@ public class Group /*implements Parcelable*/ {
 	 *    different texts to people.
 	 */
 	public void joinGroup(String number) {
-		makeMeNotRunner();
 		if(inGame) {  // You're already in a game
 			leaveGroup();
+			makeMeNotRunner();
 			sendImIn(number);
 			actAdapter.updateUI();
 		} else {  // You're not in a game
+			makeMeNotRunner();
 			sendImIn(number);
 			context.startActivity(new Intent(context, SnitchMainPage.class));
 			running.end();

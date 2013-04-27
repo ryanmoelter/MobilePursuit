@@ -44,7 +44,7 @@ public class SnitchMap extends MapActivity implements OnClickListener, Endable {
 	
 	TextView snitchTimer;
 	Timer timer;
-	int secondCounter, displayMinutes, displaySeconds, countdownSeconds;
+	int secondCounter, displayMinutes, displaySeconds, countdownSeconds, timerInterval;
 	
 	RelativeLayout buttonSnitchTagged;
 	
@@ -74,9 +74,9 @@ public class SnitchMap extends MapActivity implements OnClickListener, Endable {
 		
 		mapOverlays = mapView.getOverlays();
         mapOverlays.add(myLocationOverlay);
-        
-        snitchTimer = (TextView)findViewById(R.id.snitch_timer);
+
         secondCounter = 0;
+        snitchTimer = (TextView)findViewById(R.id.snitch_timer);
         
         timer = new Timer();
         timer.schedule(new SnitchTimerTask(), 0, 1000);
@@ -94,8 +94,14 @@ public class SnitchMap extends MapActivity implements OnClickListener, Endable {
         textTagged = (TextView)findViewById(R.id.text_snitch_tagged);
         textTagged.setTypeface(light);
         
-        game = Ref.game;
+        if(Ref.game == null) {
+        	game = new Game();
+        	Ref.game = game;
+        } else {
+        	game = Ref.game;
+        }
         group = Ref.group;
+        timerInterval = game.getInterval();
         
         group.setActAdapter(new ActivityAdapter());
         group.setRunning(this);

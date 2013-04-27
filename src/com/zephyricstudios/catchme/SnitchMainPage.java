@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -35,7 +36,7 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
 	//ArrayList<Seeker> seekerArray;
 	//SeekerAdapter adapter;
 	
-	TextView title, startText, textSnitchSettings, textSending;
+	TextView textTimeSettings;
 	
 	boolean intervalSettingsVisible, navigating = false;
 	
@@ -66,12 +67,9 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
         
         // Typeface
         light = Typeface.createFromAsset(getAssets(), "roboto_light.ttf");
-        title = (TextView)findViewById(R.id.text_snitch_title);
-        title.setTypeface(light);
-        startText = (TextView)findViewById(R.id.text_snitch_start);
-        startText.setTypeface(light);
-        textSending = (TextView)findViewById(R.id.text_sending);
-        textSending.setTypeface(light);
+        ((TextView)findViewById(R.id.text_snitch_title)).setTypeface(light);
+        ((TextView)findViewById(R.id.text_snitch_start)).setTypeface(light);
+        ((TextView)findViewById(R.id.text_sending)).setTypeface(light);
         
         /*if(this.getIntent().getExtras().getParcelable(Ref.GROUP_KEY) != null) {
         	group = this.getIntent().getExtras().getParcelable(Ref.GROUP_KEY);
@@ -106,6 +104,16 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
         group.setSeekerAdapter(new SeekerAdapter(this, R.layout.list_item, group.getPeople(), this, light));
         seekerList = (ListView)findViewById(R.id.seeker_list);
         seekerList.setAdapter(group.getSeekerAdapter());
+        seekerList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View longClicked,
+					int arg2, long arg3) {
+				Toast.makeText(SnitchMainPage.this, arg2 + " was clicked", Toast.LENGTH_LONG).show();
+				return false;
+			}
+        	
+		});
         
         if(Ref.game != null) {
         	game = Ref.game;
@@ -132,7 +140,7 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
         btnInterval45s.setTypeface(light);
         btnInterval60s.setTypeface(light);
         
-        textSnitchSettings = (TextView)findViewById(R.id.text_snitch_settings);
+        textTimeSettings = (TextView)findViewById(R.id.text_snitch_settings);
         
         sendingLayout = (RelativeLayout)findViewById(R.id.loading_layout);
         
@@ -185,28 +193,28 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
     		game.setInterval(15);
     		intervalSettings.setVisibility(View.GONE);
             intervalSettingsVisible = false;
-            textSnitchSettings.setText(game.getInterval() + " Seconds");
+            textTimeSettings.setText(game.getInterval() + " Seconds");
             break;
             
     	case R.id.button_30s:
     		game.setInterval(30);
     		intervalSettings.setVisibility(View.GONE);
             intervalSettingsVisible = false;
-            textSnitchSettings.setText(game.getInterval() + " Seconds");
+            textTimeSettings.setText(game.getInterval() + " Seconds");
             break;
             
     	case R.id.button_45s:
     		game.setInterval(45);
     		intervalSettings.setVisibility(View.GONE);
             intervalSettingsVisible = false;
-            textSnitchSettings.setText(game.getInterval() + " Seconds");
+            textTimeSettings.setText(game.getInterval() + " Seconds");
             break;
             
     	case R.id.button_60s:
     		game.setInterval(60);
     		intervalSettings.setVisibility(View.GONE);
             intervalSettingsVisible = false;
-            textSnitchSettings.setText(game.getInterval() + " Seconds");
+            textTimeSettings.setText(game.getInterval() + " Seconds");
             break;
     	
     	case R.id.grey_space:
