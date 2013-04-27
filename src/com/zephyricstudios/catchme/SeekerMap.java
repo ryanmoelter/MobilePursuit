@@ -111,11 +111,10 @@ public class SeekerMap extends MapActivity implements OnClickListener, Endable {
     			startActivity(new Intent(SeekerMap.this, GameOverPage.class));
     			SeekerMap.this.end();
         	}
-        	
-        	
         });
         
         group.setRunning(this);
+        group.setContext(this);
         
         game = Ref.game;
         

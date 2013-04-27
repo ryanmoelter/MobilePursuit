@@ -73,6 +73,7 @@ public class SeekerMainPage extends Activity implements OnClickListener, Endable
         group = Ref.group;
         group.setActAdapter(new ActivityAdapter());
         group.setRunning(this);
+        group.setContext(this);
         
         localTextReceiver = group.getBroadcastReceiver();
         filter = new IntentFilter();
@@ -187,7 +188,7 @@ public class SeekerMainPage extends Activity implements OnClickListener, Endable
 			
 			if(checkIfRealNumber(runnerNumber)) {
 				runnerNumber = convertToOnlyNumbers(runnerNumber);
-				group.joinGroup(runnerNumber, this);
+				group.joinGroup(runnerNumber);
 			}
 			break;
 		}

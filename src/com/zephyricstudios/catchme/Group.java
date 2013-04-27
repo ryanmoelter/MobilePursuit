@@ -283,7 +283,7 @@ public class Group /*implements Parcelable*/ {
 		}
 	}
 	
-	public void checkGameOver(Context context) {
+	public void checkGameOver() {
 		if(people.isEmpty()) {
 			Ref.makeAlert("Game Over", "Your friends have all left the game.", 
 					new DialogInterface.OnClickListener() {
@@ -303,11 +303,11 @@ public class Group /*implements Parcelable*/ {
 	 *    The backbone of this whole app. contains ONLY methods called from the BroadcastReceiver
 	 *    when it receives the specific messages.
 	 */
-	public void receiveImIn(final String name, final String number, final Context context) {
+	public void receiveImIn(final String name, final String number) {
 		if(inGame) {
 			if(imRunner) {  // Someone joined. Add them to the game
 				Toast.makeText(context, name + " joined the group", Toast.LENGTH_LONG).show();
-				sendImIn(number, context);
+				sendImIn(number);
 				sendImRunner(number);
 				if(!people.isEmpty()) {
 					sendHesIn(name, number); // Might as well have this running while the other one is
@@ -337,7 +337,7 @@ public class Group /*implements Parcelable*/ {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {  // Positive
 							createPerson(name, number);
-							sendImIn(number, context);
+							sendImIn(number);
 							sendImRunner(number);
 //							makeMeRunner();   not necessary
 							context.startActivity(new Intent(context, SnitchMainPage.class));
@@ -355,7 +355,7 @@ public class Group /*implements Parcelable*/ {
 		}
 	}
 	
-	public void receiveImOut(String number, Context context) {
+	public void receiveImOut(String number) {
 		// If you're in game and the runner, take them out of the list and let everyone know
 		if(inGame && imRunner && personExists(number)) {
 			Toast.makeText(context, findNameByNumber(number) + " has left the group",
@@ -368,7 +368,7 @@ public class Group /*implements Parcelable*/ {
 		}
 	}
 	
-	public void receiveYoureIn(String name, final String number, final Context context) {
+	public void receiveYoureIn(String name, final String number) {
 		// Make an alert. The text will differ slightly depending on whether you're
 		// already in a group or not.
 		if(inGame) {  // You're in a game
@@ -380,7 +380,7 @@ public class Group /*implements Parcelable*/ {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							// Leave current group, and then join the other
-							joinGroup(number, context); // this has leaveGame() in it
+							joinGroup(number); // this has leaveGame() in it
 						}
 						
 					}, "Okay, I'm in",
@@ -401,7 +401,7 @@ public class Group /*implements Parcelable*/ {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							// Join and stuff
-							joinGroup(number, context);
+							joinGroup(number);
 						}
 						
 					}, "Okay, I'm in",
@@ -424,11 +424,11 @@ public class Group /*implements Parcelable*/ {
 		actAdapter.receiveYoureOut();
 	}
 	
-	public void receiveHesIn(String name, String number, Context context) {
+	public void receiveHesIn(String name, String number) {
 		if(inGame) {
 			if(imRunner) {  // Someone is redirected by a seeker
 				createPerson(name, number);
-				sendImIn(number, context);
+				sendImIn(number);
 				sendImRunner(number);
 			} else {  // Someone joined the game through the runner
 				createPerson(name, number);
@@ -439,7 +439,7 @@ public class Group /*implements Parcelable*/ {
 		}
 	}
 	
-	public void receiveHesOut(String number, Context context) {
+	public void receiveHesOut(String number) {
 		if(inGame) {
 			if(imRunner) {  // An error occured
 				
@@ -453,7 +453,7 @@ public class Group /*implements Parcelable*/ {
 		}
 	}
 	
-	public void receiveImRunner(String number, Context context) {
+	public void receiveImRunner(String number) {
 		if(inGame) {
 			if(imRunner) {  // Glitch
 				// Do nothing
@@ -468,7 +468,7 @@ public class Group /*implements Parcelable*/ {
 		}
 	}
 	
-	public void receiveYoureRunner(String number, Context context) {
+	public void receiveYoureRunner(String number) {
 		if(inGame) {
 			if(imRunner) {  // Glitch
 				// Do nothing
@@ -504,14 +504,14 @@ public class Group /*implements Parcelable*/ {
 	 *    other things than just sending the message, like changing values or sending multiple
 	 *    different texts to people.
 	 */
-	public void joinGroup(String number, Context context) {
+	public void joinGroup(String number) {
 		makeMeNotRunner();
 		if(inGame) {  // You're already in a game
 			leaveGroup();
-			sendImIn(number, context);
+			sendImIn(number);
 			actAdapter.updateUI();
 		} else {  // You're not in a game
-			sendImIn(number, context);
+			sendImIn(number);
 			context.startActivity(new Intent(context, SnitchMainPage.class));
 			running.end();
 		}
@@ -535,7 +535,7 @@ public class Group /*implements Parcelable*/ {
 	 *    These are just easy ways to keep texting consistent. Call on these to send your
 	 *    text messages.
 	 */
-	public void sendImIn(String destinationNum, Context context) {
+	public void sendImIn(String destinationNum) {
 		SharedPreferences sp = context.getSharedPreferences(Ref.STORED_PREFERENCES_KEY,
 															Context.MODE_PRIVATE);
 		String name = sp.getString(Ref.USERNAME_KEY, "Someone");
@@ -734,14 +734,14 @@ public class Group /*implements Parcelable*/ {
 				    		
 				    		if(message.contains(Ref.IM_IN)){
 				    			name = message.replace(Ref.IM_IN, "");
-					    		group.receiveImIn(name, number, context);
+					    		group.receiveImIn(name, number);
 					    		
 					    	} else if(message.contains(Ref.IM_OUT)) {
-					    		group.receiveImOut(number, context);
+					    		group.receiveImOut(number);
 					    		
 					    	} else if(message.contains(Ref.YOURE_IN)) {
 					    		name = message.replace(Ref.YOURE_IN, "");
-					    		group.receiveYoureIn(name, number, context);
+					    		group.receiveYoureIn(name, number);
 					    		
 					    	} else if(message.contains(Ref.YOURE_OUT)) {
 					    		group.receiveYoureOut();
@@ -750,16 +750,16 @@ public class Group /*implements Parcelable*/ {
 					    		String[] array = message.replace(Ref.HES_IN, "").split(" ");
 					    		name = array[0];
 					    		number = array[1];
-					    		group.receiveHesIn(name, number, context);
+					    		group.receiveHesIn(name, number);
 					    		
 					    	} else if(message.contains(Ref.HES_OUT)) {
-					    		group.receiveHesOut(number, context);
+					    		group.receiveHesOut(number);
 					    		
 					    	} else if(message.contains(Ref.IM_RUNNER)) {
-					    		group.receiveImRunner(number, context);
+					    		group.receiveImRunner(number);
 					    		
 					    	} else if(message.contains(Ref.YOURE_RUNNER)) {
-					    		group.receiveYoureRunner(number, context);
+					    		group.receiveYoureRunner(number);
 					    		
 					    	} else if(message.contains(Ref.GEOPOINT)) {
 					    		group.receiveGeopoint(message.replace(Ref.GEOPOINT, ""));

@@ -41,6 +41,7 @@ public class ConfusedMenu extends Activity implements OnClickListener, Endable {
 		localTextReceiver = group.getBroadcastReceiver();
 		group.setActAdapter(new ActivityAdapter());
 		group.setRunning(this);
+		group.setContext(this);
 		
 		filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
@@ -60,6 +61,8 @@ public class ConfusedMenu extends Activity implements OnClickListener, Endable {
 		if(navigated) {
 			group.setActAdapter(new ActivityAdapter());
     		this.registerReceiver(localTextReceiver, filter);
+    		group.setRunning(this);
+    		group.setContext(this);
     		navigated = false;
     	}
 	}

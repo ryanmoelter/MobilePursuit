@@ -51,6 +51,7 @@ public class MainPage extends Activity implements OnClickListener, Endable {
         group.setActAdapter(new ActivityAdapter());
         group.setRunning(this);
         group.setInGame(false);
+        group.setContext(this);
         
         if(Ref.game != null) {
         	game = Ref.game;
@@ -105,6 +106,9 @@ public class MainPage extends Activity implements OnClickListener, Endable {
 //    	this.group = Ref.group;
     	if(navigated) {
     		group.setActAdapter(new ActivityAdapter());  // It will have been replaced
+    		group.setInGame(false);
+    		group.setRunning(this);
+    		group.setContext(this);
     		onReturn();
     	}
     	super.onRestart();

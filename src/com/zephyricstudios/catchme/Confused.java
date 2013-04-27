@@ -42,6 +42,7 @@ public class Confused extends Activity implements Endable {
         group = Ref.group;
         group.setActAdapter(new ActivityAdapter());
         group.setRunning(this);
+        group.setContext(this);
         
         localTextReceiver = group.getBroadcastReceiver();
         filter = new IntentFilter();
@@ -62,6 +63,8 @@ public class Confused extends Activity implements Endable {
     	if(navigated) {
 			group.setActAdapter(new ActivityAdapter());
     		this.registerReceiver(localTextReceiver, filter);
+    		group.setContext(this);
+    		group.setRunning(this);
     		navigated = false;
     	}
     }

@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 public class About extends Activity implements Endable {
 	
-	TextView zephyric, email, please, credits, mazen, mazenCredits, everyone, everyoneCredits;
 	Typeface light, thin;
 	
 	BroadcastReceiver localTextReceiver;
@@ -25,20 +24,16 @@ public class About extends Activity implements Endable {
 		light = Typeface.createFromAsset(getAssets(), "roboto_light.ttf");
 		thin = Typeface.createFromAsset(getAssets(), "roboto_thin.ttf");
 		
-		zephyric = (TextView)findViewById(R.id.zephyric_studios);
-		zephyric.setTypeface(thin);
-		email = (TextView)findViewById(R.id.email);
-		email.setTypeface(light);
-		credits = (TextView)findViewById(R.id.credits);
-		credits.setTypeface(light);
-		mazen = (TextView)findViewById(R.id.mazen);
-		mazen.setTypeface(light);
-		everyone = (TextView)findViewById(R.id.everyone);
-		everyone.setTypeface(light);
+		((TextView)findViewById(R.id.zephyric_studios)).setTypeface(thin);
+		((TextView)findViewById(R.id.email)).setTypeface(light);
+		((TextView)findViewById(R.id.credits)).setTypeface(light);
+		((TextView)findViewById(R.id.mazen)).setTypeface(light);
+		((TextView)findViewById(R.id.everyone)).setTypeface(light);
 		
 		group = Ref.group;
 		group.setActAdapter(new ActivityAdapter());
 		group.setRunning(this);
+		group.setContext(this);
 		
 		localTextReceiver = group.getBroadcastReceiver();
 		filter = new IntentFilter();
@@ -59,6 +54,8 @@ public class About extends Activity implements Endable {
 		if(navigated) {
 			group.setActAdapter(new ActivityAdapter());
     		this.registerReceiver(localTextReceiver, filter);
+    		group.setRunning(this);
+    		group.setContext(this);
     		navigated = false;
     	}
 	}

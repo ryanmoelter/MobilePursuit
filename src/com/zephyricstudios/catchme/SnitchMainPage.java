@@ -101,6 +101,7 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
         });
         group.setRunning(this);
         group.setInGame(true);
+        group.setContext(this);
         
         group.setSeekerAdapter(new SeekerAdapter(this, R.layout.list_item, group.getPeople(), this, light));
         seekerList = (ListView)findViewById(R.id.seeker_list);

@@ -44,6 +44,7 @@ public class GameOverPage extends Activity implements OnClickListener, Endable {
 		localTextReceiver = group.getBroadcastReceiver();
 		group.setActAdapter(new ActivityAdapter());
 		group.setRunning(this);
+		group.setContext(this);
 		
 		filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
