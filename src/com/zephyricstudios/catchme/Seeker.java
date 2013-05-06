@@ -5,22 +5,22 @@ import android.os.Parcelable;
 
 public class Seeker implements Parcelable {
 	
-	private String mName, mNumber;
+	private String name, number;
 	private boolean isRunner;
 	
 	public Seeker(String name, String number) {
-		mName = name;
-		mNumber = number;
+		this.name = name;
+		this.number = number;
 		isRunner = false;
 	}
 	
 	// Queries
 	public String getName() {
-		return mName;
+		return name;
 	}
 	
 	public String getNumber() {
-		return mNumber;
+		return number;
 	}
 	
 	public boolean isRunner() {
@@ -34,6 +34,25 @@ public class Seeker implements Parcelable {
 	
 	public void makeNotRunner() {
 		isRunner = false;
+	}
+	
+	public String toString() {
+		return name;
+	}
+	
+	public boolean equals(Object o) {
+		if(o == null) {
+			return false;
+		}
+		
+		if(o.getClass() != this.getClass()) {
+			return false;
+		}
+		
+		Seeker other = (Seeker)o;
+		return name.equals(other.getName()) &&
+			   number.equals(other.getNumber()) &&
+			   (isRunner == other.isRunner());
 	}
 
 	
@@ -78,8 +97,8 @@ public class Seeker implements Parcelable {
 
     // write your object's data to the passed-in Parcel
     public void writeToParcel(Parcel out, int flags) {
-        out.writeString(mName);
-        out.writeString(mNumber);
+        out.writeString(name);
+        out.writeString(number);
     }
 
     // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
@@ -95,8 +114,8 @@ public class Seeker implements Parcelable {
 
     // example constructor that takes a Parcel and gives you an object populated with it's values
     private Seeker(Parcel in) {
-        mName = in.readString();
-        mNumber = in.readString();
+        name = in.readString();
+        number = in.readString();
     }
 
 }
