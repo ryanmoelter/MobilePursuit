@@ -52,6 +52,12 @@ public class GameOverPage extends Activity implements OnClickListener, Endable {
 	}
 	
 	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		this.unregisterReceiver(localTextReceiver);
+	}
+	
+	@Override
 	public void end() {
 		finish();
 	}

@@ -122,6 +122,7 @@ public class Ref {
 		
 		alert.setPositiveButton(positiveText, onPositive);
 		alert.setNegativeButton(negativeText, onNegative);
+		alert.show();
 	}
 	
 	public static void makeAlert(String title, String content, OnClickListener onPositive,
@@ -131,5 +132,6 @@ public class Ref {
 		alert.setMessage(content);
 		
 		alert.setPositiveButton(positiveText, onPositive);
+		alert.show();
 	}
 }

@@ -20,7 +20,7 @@ public class Group /*implements Parcelable*/ {
 	private BroadcastReceiver broadcastReceiver = createBroadcastReceiver();
 	private static SmsManager sm = SmsManager.getDefault();
 	private Endable running;
-	private Context context;  // TODO make this a thing. Otherwise, you can't make alerts.
+	private Context context;
 //	private String myName;
 	
 	/* TODO
@@ -32,6 +32,21 @@ public class Group /*implements Parcelable*/ {
 	 *  way than using runnables? Maybe have them return an array of numbers and contents? Or
 	 *  have them return an array of textMessage objects?
 	 *  Also, if/when this does happen, don't forget to put 500ms of delay between the messages.
+	 */
+	
+	/*
+	 * Index:
+	 *    1. Constructors
+	 *    2. Queries
+	 *    3. Commands
+	 *    4. Runner Management
+	 *    5. Private Group Management
+	 *    6. Miscellaneous
+	 *    7. Receiving Texts
+	 *    8. Methods of Sending Texts
+	 *    9. Sending Texts
+	 *   10. Texting
+	 *   11. BroadcastReceiver Creation
 	 */
 	
 	
@@ -190,7 +205,7 @@ public class Group /*implements Parcelable*/ {
 	
 	public void makeRunnerByNumber(String number) {
 		for(Seeker person : people) {
-			if(person.getNumber() == number) {
+			if(person.getNumber().equals(number)) {
 				person.makeRunner();
 				break;
 			}
@@ -213,7 +228,7 @@ public class Group /*implements Parcelable*/ {
 	
 	public void removeRunnerByNumber(String number) {
 		for(Seeker person : people) {
-			if(person.getNumber() == number) {
+			if(person.getNumber().equals(number)) {
 				person.makeNotRunner();
 			}
 		}
@@ -305,7 +320,7 @@ public class Group /*implements Parcelable*/ {
 	 */
 	public void receiveImIn(final String name, final String number) {
 		if(inGame) {
-			if(imRunner) {  // Someone joined. Add them to the game
+			if(imRunner && !joinedSomeone) {  // Someone joined. Add them to the game
 				Toast.makeText(context, name + " joined the group", Toast.LENGTH_LONG).show();
 				sendImIn(number);
 				sendImRunner(number);
@@ -325,7 +340,12 @@ public class Group /*implements Parcelable*/ {
 				}
 				createPerson(name, number);
 				
-			} else {  // Someone joined, but you're not the runner. Let the runner know
+			} else if(imRunner && joinedSomeone) {  // I've just joined someone else's game.
+				                                    // Don't send them the confirmation texts.
+				createPerson(name, number);  // Also, this only works if the runner is the
+											 // first to join the group.
+			}
+			else {  // Someone joined, but you're not the runner. Let the runner know
 				      // they want in
 				sendRunnerHesIn(name, number);
 			}
@@ -340,6 +360,7 @@ public class Group /*implements Parcelable*/ {
 							// ^ This isn't necessary, since the runner will return it with an I'm in
 							sendImIn(number);
 							sendImRunner(number);
+							createPerson(name, number);
 //							makeMeRunner();   not necessary
 							context.startActivity(new Intent(context, SnitchMainPage.class));
 							Group.this.running.end();
@@ -363,9 +384,13 @@ public class Group /*implements Parcelable*/ {
 						   Toast.LENGTH_LONG).show();
 			removePersonByNumber(number);
 			sendHesOut(number);
-		} else {
-			// Do nothing, since the seeker will handle everything
-			// Also, if you're not in the game, neither are they anymore
+		} else if(inGame && !imRunner) {  // Someone thinks you're the runner.
+										  // Let the real runner know they want out.
+			if(personExists(number)) {  // But only if they exist.
+				sendHesOutToRunner(number);
+			}
+		} else {  // If you're not in the game, neither are they anymore
+			// Do nothing
 		}
 	}
 	
@@ -421,7 +446,42 @@ public class Group /*implements Parcelable*/ {
 	}
 	
 	public void receiveYoureOut() {
-		// TODO Make this
+		if(inGame) {
+			if(imRunner) {  // There's no mutiny here.
+				// Do nothing
+			} else {
+				if(joinedSomeone) {  // They rejected your invitation. Fine, you didn't want
+									 // to be in their group anyway.
+					running.end();  // This needs to be in here, or else it will clear
+									// joinedSomeone and make it impossible to do this logic.
+					Ref.makeAlert("Rejected", "They didn't want to play with you. " + 
+								  "Better find someone else to play with.",
+								  new DialogInterface.OnClickListener() {
+									
+									  @Override
+									  public void onClick(DialogInterface dialog, int which) {
+										  // Do nothing
+									  }
+									  
+								  }, "Sucks to suck", context);
+									 // Maybe we shouldn't say "sucks to suck"?
+				} else {
+					running.end();
+					Ref.makeAlert("You're Out", "You've been kicked out of the game. " + 
+								  "Better find someone else to play with.",
+								  new DialogInterface.OnClickListener() {
+								
+								  @Override
+								  public void onClick(DialogInterface dialog, int which) {
+									  // Do nothing
+								  }
+								  
+							  }, "Sucks to suck", context);
+				}
+			}
+		} else {  // You're already out
+			// Do nothing
+		}
 		actAdapter.receiveYoureOut();
 	}
 	
@@ -442,9 +502,11 @@ public class Group /*implements Parcelable*/ {
 	
 	public void receiveHesOut(String number) {
 		if(inGame) {
-			if(imRunner) {  // An error occured
-				
-			} else {  // Someone left
+			if(imRunner) {  // Someone else might be redirecting this, better let everyone know
+				if(personExists(number)) {
+					receiveImOut(number);
+				}
+			} else {  // Someone left. Remove them.
 				Toast.makeText(context, findNameByNumber(number) + " has left the group",
 							   Toast.LENGTH_LONG).show();
 				removePersonByNumber(number);
@@ -456,13 +518,17 @@ public class Group /*implements Parcelable*/ {
 	
 	public void receiveImRunner(String number) {
 		if(inGame) {
-			if(imRunner) {  // This is a glitch
-				// Do nothing
+			if(imRunner) {  // I've probably just joined the game, and
+							// I need to make them the runner
+				makeMeNotRunner();
+				makeRunnerByNumber(number);
+				actAdapter.updateUI();
 			} else {  // There's a new runner. Make them the runner (in data)
 				clearRunners();
 				makeRunnerByNumber(number);
 				Toast.makeText(context, findNameByNumber(number) + " is now the runner",
 							   Toast.LENGTH_LONG).show();
+				actAdapter.updateUI();
 			}
 		} else {  // Someone thinks you're in their game, but you're not
 			sendImOut(number);  // Let them know you're not in their game
@@ -506,13 +572,12 @@ public class Group /*implements Parcelable*/ {
 	 *    different texts to people.
 	 */
 	public void joinGroup(String number) {
-		if(inGame) {  // You're already in a game
+		if(inGame) {  // You're already in a game. Leave and join another
 			leaveGroup();
-			makeMeNotRunner();
+			makeMeRunner();
 			sendImIn(number);
 			actAdapter.updateUI();
-		} else {  // You're not in a game
-			makeMeNotRunner();
+		} else {  // You're not in a game. Join the game
 			sendImIn(number);
 			context.startActivity(new Intent(context, SnitchMainPage.class));
 			running.end();
@@ -568,6 +633,10 @@ public class Group /*implements Parcelable*/ {
 	
 	private void sendHesOut(String number) {
 		sendEveryoneTexts(Ref.HES_OUT + number);
+	}
+	
+	private void sendHesOutToRunner(String number) {
+		sendText(findRunner().getNumber(), Ref.HES_OUT + number);
 	}
 	
 	private void sendTheyreIn(String number) {

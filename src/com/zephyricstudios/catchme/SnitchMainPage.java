@@ -85,6 +85,7 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
         		game.setInterval(interval);
         		Ref.group = group;
         		Ref.game = game;
+        		startActivity(new Intent(SnitchMainPage.this, SeekerMap.class));
         		SnitchMainPage.this.end();
         	}
         	
@@ -101,7 +102,8 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
         group.setInGame(true);
         group.setContext(this);
         
-        group.setSeekerAdapter(new SeekerAdapter(this, R.layout.list_item, group.getPeople(), this, light));
+        group.setSeekerAdapter(new SeekerAdapter(this, R.layout.list_item, group.getPeople(),
+        					   this, light));
         seekerList = (ListView)findViewById(R.id.seeker_list);
         seekerList.setAdapter(group.getSeekerAdapter());
         seekerList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -109,7 +111,9 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0, View longClicked,
 					int arg2, long arg3) {
-				Toast.makeText(SnitchMainPage.this, arg2 + " was clicked", Toast.LENGTH_LONG).show();
+				// TODO Make a context menu that lets you make them the runner or kick them out
+				Toast.makeText(SnitchMainPage.this, group.getPeople().get(arg2).getName()
+						+ " was clicked", Toast.LENGTH_LONG).show();
 				return false;
 			}
         	
@@ -165,13 +169,17 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
     	switch(v.getId()) {
     	case R.id.snitch_start_button:
     		if(!group.getPeople().isEmpty()){
-    			group.sendGameStart(game.getInterval());
-    			sendingLayout.setVisibility(View.VISIBLE);
-    			
-    			Ref.group = group;
-    			Ref.game = game;
-    			this.startActivity(new Intent(this, SnitchMap.class));
-    			end();
+    			if(group.imRunner()) {
+    				group.sendGameStart(game.getInterval());
+        			sendingLayout.setVisibility(View.VISIBLE);
+        			
+        			Ref.group = group;
+        			Ref.game = game;
+        			this.startActivity(new Intent(this, SnitchMap.class));
+        			end();
+    			} else {
+    				Toast.makeText(this, "You're not the runner!", Toast.LENGTH_SHORT).show();
+    			}
     		} else {
     			Toast.makeText(this, "At least one seeker is required to continue",
     					Toast.LENGTH_SHORT).show();

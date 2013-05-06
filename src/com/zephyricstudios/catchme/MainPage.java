@@ -105,8 +105,8 @@ public class MainPage extends Activity implements OnClickListener, Endable {
     protected void onRestart() {
 //    	this.group = Ref.group;
     	if(navigated) {
+    		group.clear();
     		group.setActAdapter(new ActivityAdapter());  // It will have been replaced
-    		group.setInGame(false);
     		group.setRunning(this);
     		group.setContext(this);
     		onReturn();

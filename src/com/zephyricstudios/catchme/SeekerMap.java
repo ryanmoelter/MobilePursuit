@@ -81,9 +81,6 @@ public class SeekerMap extends MapActivity implements OnClickListener, Endable {
         findMe = true;
         navigating = false;
         
-        timer = new Timer();
-        timer.schedule(new SeekerTimerTask(), 0, 1000);
-        
      // Typeface
         thin = Typeface.createFromAsset(getAssets(), "roboto_thin.ttf");
         seekerTimer.setTypeface(thin);
@@ -117,6 +114,9 @@ public class SeekerMap extends MapActivity implements OnClickListener, Endable {
         group.setContext(this);
         
         game = Ref.game;
+        
+        timer = new Timer();
+        timer.schedule(new SeekerTimerTask(), 0, 1000);
         
         localTextReceiver = group.getBroadcastReceiver();
         /*localTextReceiver = new BroadcastReceiver(){
@@ -301,7 +301,7 @@ public class SeekerMap extends MapActivity implements OnClickListener, Endable {
 
         @Override
         public void run() {
-        	if(secondCounter >= game.getInterval()){
+        	if(secondCounter >= game.getInterval()) {
         		secondCounter = game.getInterval();
         	}
         	countdownSeconds = game.getInterval() - secondCounter;

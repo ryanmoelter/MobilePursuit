@@ -44,7 +44,7 @@ public class SnitchMap extends MapActivity implements OnClickListener, Endable {
 	
 	TextView snitchTimer;
 	Timer timer;
-	int secondCounter, displayMinutes, displaySeconds, countdownSeconds, timerInterval;
+	int secondCounter, displayMinutes, displaySeconds, countdownSeconds;
 	
 	RelativeLayout buttonSnitchTagged;
 	
@@ -74,25 +74,12 @@ public class SnitchMap extends MapActivity implements OnClickListener, Endable {
 		
 		mapOverlays = mapView.getOverlays();
         mapOverlays.add(myLocationOverlay);
-
-        secondCounter = 0;
-        snitchTimer = (TextView)findViewById(R.id.snitch_timer);
-        
-        timer = new Timer();
-        timer.schedule(new SnitchTimerTask(), 0, 1000);
         
         buttonSnitchTagged = (RelativeLayout)findViewById(R.id.button_snitch_tagged);
         buttonSnitchTagged.setOnClickListener(this);
         
         mapExpanded = false;
         navigating = false;
-        
-        // Typeface
-        thin = Typeface.createFromAsset(getAssets(), "roboto_thin.ttf");
-        snitchTimer.setTypeface(thin);
-        light = Typeface.createFromAsset(getAssets(), "roboto_light.ttf");
-        textTagged = (TextView)findViewById(R.id.text_snitch_tagged);
-        textTagged.setTypeface(light);
         
         if(Ref.game == null) {
         	game = new Game();
@@ -101,17 +88,29 @@ public class SnitchMap extends MapActivity implements OnClickListener, Endable {
         	game = Ref.game;
         }
         group = Ref.group;
-        timerInterval = game.getInterval();
         
         group.setActAdapter(new ActivityAdapter());
         group.setRunning(this);
         group.setContext(this);
+
+        secondCounter = 0;
+        snitchTimer = (TextView)findViewById(R.id.snitch_timer);
+        
+        timer = new Timer();
+        timer.schedule(new SnitchTimerTask(), 0, 1000);
         
         localTextReceiver = group.getBroadcastReceiver();
         
         filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
+        
+        // Typeface
+        thin = Typeface.createFromAsset(getAssets(), "roboto_thin.ttf");
+        snitchTimer.setTypeface(thin);
+        light = Typeface.createFromAsset(getAssets(), "roboto_light.ttf");
+        textTagged = (TextView)findViewById(R.id.text_snitch_tagged);
+        textTagged.setTypeface(light);
 	}
 	
 	@Override
@@ -189,7 +188,7 @@ public class SnitchMap extends MapActivity implements OnClickListener, Endable {
         public void run() {
         	if(secondCounter >= game.getInterval()){
         		if(myLocationOverlay.getMyLocation() == null) {
-        			group.sendGeopoint(null);
+        			group.sendGeopoint("null");
         		} else {
         			group.sendGeopoint(String.valueOf(myLocationOverlay.getMyLocation()));
         		}
