@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/make_runner"
+        android:title="@string/make_runner"/>
+    
+    <item
+        android:id="@+id/kick_out"
+        android:title="@string/kick_out" />
+
+</menu>

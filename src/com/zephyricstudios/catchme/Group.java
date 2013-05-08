@@ -15,7 +15,7 @@ import android.widget.Toast;
 public class Group /*implements Parcelable*/ {
 	private ArrayList<Seeker> people;
 	private SeekerAdapter seekerAdapter;
-	private boolean isSeekerAdapterNeeded = false, imRunner = true, inGame = false, joinedSomeone = false;
+	private boolean isSeekerAdapterNeeded = false, imRunner = true, inGame = false, joining = false;
 	private ActivityAdapter actAdapter;
 	private BroadcastReceiver broadcastReceiver = createBroadcastReceiver();
 	private static SmsManager sm = SmsManager.getDefault();
@@ -138,10 +138,10 @@ public class Group /*implements Parcelable*/ {
 		actAdapter = null;
 	}
 	
-	public void clearPeople() {
-		people.clear();
-		notifyAdapter();
-	}
+//	private void clearPeople() {
+//		people.clear();
+//		notifyAdapter();
+//	}
 	
 	public void setSeekerAdapter(SeekerAdapter adapter) {
 		this.seekerAdapter = adapter;
@@ -176,7 +176,7 @@ public class Group /*implements Parcelable*/ {
 	
 	/*
 	 * Runner management
-	 *    Really, this is a sub-category of Commands. It is all the commands related to runners
+	 *    These are all the private methods related to runners
 	 *    and managing who is the runner that don't involve texting.
 	 */
 	private boolean isThereARunner() {
@@ -190,23 +190,32 @@ public class Group /*implements Parcelable*/ {
 		return result;
 	}
 	
-	public void makeMeRunner() {
+	private void makeMeRunner() {
 		imRunner = true;
+		updateUI();
 	}
 	
-	public void makeMeNotRunner() {
+	private void makeMeNotRunner() {
 		imRunner = false;
+		updateUI();
 	}
 	
-	public void makeRunner(int index) {
-		people.get(index).makeRunner();
-		notifyAdapter();
+	private void makeRunner(Seeker person) {
+		person.makeRunner();
+		if(isSeekerAdapterNeeded) {
+			seekerAdapter.notifyDataSetChanged();
+		}
 	}
 	
-	public void makeRunnerByNumber(String number) {
+//	private void makeRunnerByIndex(int index) {
+//		people.get(index).makeRunner();
+//		notifyAdapter();
+//	}
+	
+	private void makeRunnerByNumber(String number) {
 		for(Seeker person : people) {
 			if(person.getNumber().equals(number)) {
-				person.makeRunner();
+				makeRunner(person);
 				break;
 			}
 		}
@@ -222,19 +231,20 @@ public class Group /*implements Parcelable*/ {
 		             // you're a seeker
 	}
 	
-	public void removeRunner(int index) {
-		people.get(index).makeNotRunner();
-	}
+	// These might be useful when/if we have multiple seekers
+//	private void removeRunner(int index) {
+//		people.get(index).makeNotRunner();
+//	}
+//	
+//	private void removeRunnerByNumber(String number) {
+//		for(Seeker person : people) {
+//			if(person.getNumber().equals(number)) {
+//				person.makeNotRunner();
+//			}
+//		}
+//	}
 	
-	public void removeRunnerByNumber(String number) {
-		for(Seeker person : people) {
-			if(person.getNumber().equals(number)) {
-				person.makeNotRunner();
-			}
-		}
-	}
-	
-	public void clearRunners() {
+	private void clearRunners() {
 		for(Seeker person : people) {
 			person.makeNotRunner();
 		}
@@ -253,7 +263,7 @@ public class Group /*implements Parcelable*/ {
 		}
 	}
 	
-	public void removePerson(int index) {
+	private void removePerson(int index) {
 		people.remove(index);
 		notifyAdapter();
 	}
@@ -287,6 +297,15 @@ public class Group /*implements Parcelable*/ {
 		return "Someone";
 	}
 	
+	private Seeker findPersonByNumber(String number) {
+		for(Seeker person : people) {
+			if(person.getNumber().equals(number)) {
+				return person;
+			}
+		}
+		return null;
+	}
+	
 	
 	/*
 	 * Miscellaneous
@@ -295,6 +314,12 @@ public class Group /*implements Parcelable*/ {
 	private void notifyAdapter() {  // This lets the ListView know that the data has changed
 		if(isSeekerAdapterNeeded) {  // ...But only if there is a list view to notify
 			seekerAdapter.notifyDataSetChanged();
+		}
+	}
+	
+	private void updateUI() {
+		if(this.inGame) {
+			this.actAdapter.updateUI();
 		}
 	}
 	
@@ -320,10 +345,9 @@ public class Group /*implements Parcelable*/ {
 	 */
 	public void receiveImIn(final String name, final String number) {
 		if(inGame) {
-			if(imRunner && !joinedSomeone) {  // Someone joined. Add them to the game
+			if(imRunner) {  // Someone joined. Add them to the game
 				Toast.makeText(context, name + " joined the group", Toast.LENGTH_LONG).show();
 				sendImIn(number);
-				sendImRunner(number);
 				if(!people.isEmpty()) {
 					sendHesIn(name, number); // Might as well have this running while the other one is
 					sendTheyreIn(number);
@@ -340,17 +364,19 @@ public class Group /*implements Parcelable*/ {
 				}
 				createPerson(name, number);
 				
-			} else if(imRunner && joinedSomeone) {  // I've just joined someone else's game.
-				                                    // Don't send them the confirmation texts.
-				createPerson(name, number);  // Also, this only works if the runner is the
-											 // first to join the group.
-			}
-			else {  // Someone joined, but you're not the runner. Let the runner know
-				      // they want in
-				sendRunnerHesIn(name, number);
+			} else {  
+				if(joining) {  // You've just joined someone else's game. Make them the runner
+					createPerson(name, number);  // Also, this only works if the runner is the
+												 // first to join the group.
+					makeMeNotRunner();
+					makeRunner(this.findPersonByNumber(number));
+				} else {  // Someone joined, but you're not the runner. Let the runner know
+						  // they want in
+					sendRunnerHesIn(name, number);
+				}
 			}
 			
-		} else {
+		} else {  // You're not in a game yet. Show an invitation
 			Ref.makeAlert(name + " wants to play", name + " wants you to be the runner.",
 					new DialogInterface.OnClickListener() {
 						
@@ -450,30 +476,27 @@ public class Group /*implements Parcelable*/ {
 			if(imRunner) {  // There's no mutiny here.
 				// Do nothing
 			} else {
-				if(joinedSomeone) {  // They rejected your invitation. Fine, you didn't want
-									 // to be in their group anyway.
-					running.end();  // This needs to be in here, or else it will clear
-									// joinedSomeone and make it impossible to do this logic.
+				if(joining) {  // They rejected your invitation. Fine, you didn't want
+							   // to be in their group anyway.
 					Ref.makeAlert("Rejected", "They didn't want to play with you. " + 
 								  "Better find someone else to play with.",
 								  new DialogInterface.OnClickListener() {
 									
 									  @Override
 									  public void onClick(DialogInterface dialog, int which) {
-										  // Do nothing
+										  running.end();
 									  }
 									  
 								  }, "Sucks to suck", context);
 									 // Maybe we shouldn't say "sucks to suck"?
 				} else {
-					running.end();
 					Ref.makeAlert("You're Out", "You've been kicked out of the game. " + 
 								  "Better find someone else to play with.",
 								  new DialogInterface.OnClickListener() {
 								
 								  @Override
 								  public void onClick(DialogInterface dialog, int which) {
-									  // Do nothing
+									  running.end();
 								  }
 								  
 							  }, "Sucks to suck", context);
@@ -522,13 +545,11 @@ public class Group /*implements Parcelable*/ {
 							// I need to make them the runner
 				makeMeNotRunner();
 				makeRunnerByNumber(number);
-				actAdapter.updateUI();
 			} else {  // There's a new runner. Make them the runner (in data)
 				clearRunners();
 				makeRunnerByNumber(number);
 				Toast.makeText(context, findNameByNumber(number) + " is now the runner",
 							   Toast.LENGTH_LONG).show();
-				actAdapter.updateUI();
 			}
 		} else {  // Someone thinks you're in their game, but you're not
 			sendImOut(number);  // Let them know you're not in their game
@@ -543,7 +564,7 @@ public class Group /*implements Parcelable*/ {
 				clearRunners();
 				makeMeRunner();
 				actAdapter.updateUI();
-				sendImRunner();
+				sendImRunnerExcept(number);
 				Toast.makeText(context, "You are now the runner", Toast.LENGTH_LONG).show();
 			}
 		} else {  // Someone thinks you're in their game, but you're not
@@ -574,15 +595,16 @@ public class Group /*implements Parcelable*/ {
 	public void joinGroup(String number) {
 		if(inGame) {  // You're already in a game. Leave and join another
 			leaveGroup();
-			makeMeRunner();
+			makeMeNotRunner();
 			sendImIn(number);
 			actAdapter.updateUI();
 		} else {  // You're not in a game. Join the game
 			sendImIn(number);
+			makeMeNotRunner();
 			context.startActivity(new Intent(context, SnitchMainPage.class));
 			running.end();
 		}
-		joinedSomeone = true;
+		joining = true;
 	}
 	
 	public void leaveGroup() {
@@ -594,6 +616,18 @@ public class Group /*implements Parcelable*/ {
 			e.printStackTrace();
 		}
 		this.clear();
+	}
+	
+	public void kickOut(int position) {
+		sendHesOut(people.get(position).getNumber());
+		sendYoureOut(people.get(position).getNumber());
+		removePerson(position);
+	}
+	
+	public void makeRunner(int position) {
+		sendYoureRunner(people.get(position).getNumber());
+		makeRunner(people.get(position));
+		makeMeNotRunner();
 	}
 	
 	
@@ -632,7 +666,7 @@ public class Group /*implements Parcelable*/ {
 	}
 	
 	private void sendHesOut(String number) {
-		sendEveryoneTexts(Ref.HES_OUT + number);
+		sendEveryoneTextsExcept(Ref.HES_OUT + number, number);
 	}
 	
 	private void sendHesOutToRunner(String number) {
@@ -650,7 +684,7 @@ public class Group /*implements Parcelable*/ {
 	}
 	
 	private void sendHesIn(String name, String number) {
-		sendEveryoneTexts(Ref.HES_IN + name + " " + number);
+		sendEveryoneTextsExcept(Ref.HES_IN + name + " " + number, number);
 	}
 	
 	private void sendRunnerHesIn(String name, String number) {
@@ -667,6 +701,10 @@ public class Group /*implements Parcelable*/ {
 	
 	private void sendImRunner() {
 		sendEveryoneTexts(Ref.IM_RUNNER);
+	}
+	
+	private void sendImRunnerExcept(String excludedNumber) {
+		sendEveryoneTextsExcept(Ref.IM_RUNNER, excludedNumber);
 	}
 	
 	private static void sendImRunner(String number) {
@@ -733,6 +771,25 @@ public class Group /*implements Parcelable*/ {
 					} catch (InterruptedException e) {
 						// Auto-generated catch block
 						e.printStackTrace();
+					}
+				}
+			}
+		}.start();
+	}
+	
+	private void sendEveryoneTextsExcept(final String content, final String excludedNumber) {
+		new Thread() {
+			public void run() {
+				for(Seeker person : people) {
+					if(!person.getNumber().equals(excludedNumber)) {
+						sm.sendTextMessage(person.getNumber(), null, Ref.CATCH_ME + content,
+								null, null);
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							// Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
 			}

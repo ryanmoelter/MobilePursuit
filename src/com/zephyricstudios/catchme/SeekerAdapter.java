@@ -44,7 +44,6 @@ public class SeekerAdapter extends ArrayAdapter<Seeker> {
 			holder = new ViewHolder();
 			holder.textName = (TextView) convertView.findViewById(R.id.item_text);
 			holder.textName.setTypeface(light);
-			holder.buttonDelete = (ImageView) convertView.findViewById(R.id.item_delete);
 			
 			convertView.setTag(holder);
 			
@@ -54,8 +53,6 @@ public class SeekerAdapter extends ArrayAdapter<Seeker> {
 		
 		holder.textName.setText(values.get(position).getName());
 		holder.textName.setTypeface(light);
-		holder.buttonDelete.setOnClickListener(listener);
-		holder.buttonDelete.setTag("" + position);
 		
 		return convertView;
 		

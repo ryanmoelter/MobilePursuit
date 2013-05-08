@@ -3,23 +3,25 @@ package com.zephyricstudios.catchme;
 import android.os.Bundle;
 import android.app.Activity;
 import android.telephony.SmsManager;
+import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnClickListener;
+import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.view.View;
-import android.view.View.OnClickListener;
+import android.graphics.Typeface;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.graphics.Typeface;
 import android.widget.ListView;
-
-import com.zephyricstudios.catchme.SeekerAdapter;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class SnitchMainPage extends Activity implements OnClickListener, Endable {
 	
@@ -91,11 +93,7 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
         	
         	@Override
         	public void updateUI() {
-        		if(group.imRunner()) {
-        			SnitchMainPage.this.makeMeRunner();
-        		} else {
-        			SnitchMainPage.this.makeMeSeeker();
-        		}
+        		SnitchMainPage.this.updateUI();
         	}
         });
         group.setRunning(this);
@@ -106,18 +104,6 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
         					   this, light));
         seekerList = (ListView)findViewById(R.id.seeker_list);
         seekerList.setAdapter(group.getSeekerAdapter());
-        seekerList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-			@Override
-			public boolean onItemLongClick(AdapterView<?> arg0, View longClicked,
-					int arg2, long arg3) {
-				// TODO Make a context menu that lets you make them the runner or kick them out
-				Toast.makeText(SnitchMainPage.this, group.getPeople().get(arg2).getName()
-						+ " was clicked", Toast.LENGTH_LONG).show();
-				return false;
-			}
-        	
-		});
         
         if(Ref.game != null) {
         	game = Ref.game;
@@ -130,7 +116,7 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
         intervalSettings.setVisibility(View.GONE);
         intervalSettingsVisible = false;
         
-        // TODO This needs to go.
+        // TODO This needs to go. Make a ticker/picker/whatever they're called please
         btnInterval15s = (Button)findViewById(R.id.button_15s);
         btnInterval30s = (Button)findViewById(R.id.button_30s);
         btnInterval45s = (Button)findViewById(R.id.button_45s);
@@ -152,6 +138,8 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
         filter = new IntentFilter();
         filter.addAction(Ref.ACTION);
         this.registerReceiver(this.localTextReceiver, filter);
+        
+        updateUI();
     }
     
     @Override
@@ -186,11 +174,11 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
     		}
     		break;
     	
-    	case R.id.item_delete:
-    		int position = (int)Integer.valueOf((String)v.getTag());
-    		group.sendYoureOut(position);
-    		group.removePerson(position);
-    		break;
+//    	case R.id.item_delete:
+//    		int position = (int)Integer.valueOf((String)v.getTag());
+//    		group.sendYoureOut(position);
+//    		group.kickOut(position);
+//    		break;
     	
     	case R.id.snitch_settings_button:
     		intervalSettings.setVisibility(View.VISIBLE);
@@ -266,13 +254,45 @@ public class SnitchMainPage extends Activity implements OnClickListener, Endable
 	     return super.onKeyDown(keyCode, event);
 	}
     
+    public void updateUI() {
+    	if(group.imRunner()) {
+			SnitchMainPage.this.makeMeRunner();
+		} else {
+			SnitchMainPage.this.makeMeSeeker();
+		}
+    }
+    
     public void makeMeRunner() {
     	// TODO makeMeRunner code, called from updateUI()
+    	this.registerForContextMenu(seekerList);
     }
     
     public void makeMeSeeker() {
     	// TODO makeMeSeeker code, called from updateUI()
+    	this.unregisterForContextMenu(seekerList);
     }
+    
+    @Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+	                                ContextMenuInfo menuInfo) {
+	    super.onCreateContextMenu(menu, v, menuInfo);
+	    getMenuInflater().inflate(R.menu.seeker_context, menu);
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+	    AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+	    switch (item.getItemId()) {
+	        case R.id.make_runner:
+	        	group.makeRunner(info.position);
+	            return true;
+	        case R.id.kick_out:
+	        	group.kickOut(info.position);
+	            return true;
+	        default:
+	            return super.onContextItemSelected(item);
+	    }
+	}
 
 	@Override
 	public void end() {  // What to do when the activity is closing on purpose

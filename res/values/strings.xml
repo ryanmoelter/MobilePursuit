@@ -28,14 +28,13 @@
     <string name="title_activity_seeker_waiting">SeekerWaitingActivity</string>
 
     <!-- Snitch Main Page layout -->
-    <string name="group">Group&#8230;</string>
+    <string name="group">Group</string>
     <string name="start">Start</string>
-    <string name="settings">Change Interval (30 Sec)</string>
+    <string name="settings">Change interval (30 Sec)</string>
     <string name="seeker_name">Empty</string>
-    <string name="sending_texts">Sending Text Messages&#8230;</string>
-
-    <!-- Seeker waiting layout -->
-    <string name="wait_for_snitch">Waiting for runner&#8230;</string>
+    <string name="sending_texts">Sending text messages&#8230;</string>
+    <string name="make_runner">Make runner</string>
+    <string name="kick_out">"Remove from group</string>
 
     <!-- Accessibility stuff -->
     <string name="access_seeker">Seeker Icon</string>
