@@ -73,7 +73,8 @@ public class SeekerWaitingPage extends Activity {
 		};
 		filter = new IntentFilter();
         filter.addAction(CmiycJavaRes.ACTION);
-        this.registerReceiver(this.localTextReceiver, filter);
+        filter.setPriority(999);
+        registerReceiver(localTextReceiver, filter);
 	}
 
 	@Override
@@ -86,13 +87,13 @@ public class SeekerWaitingPage extends Activity {
 	@Override
 	public void onPause(){
 		super.onPause();
-		this.unregisterReceiver(this.localTextReceiver);
+		unregisterReceiver(localTextReceiver);
 	}
 	
 	@Override
     public void onResume(){
     	super.onResume();
-    	this.registerReceiver(this.localTextReceiver, filter);
+    	registerReceiver(localTextReceiver, filter);
     	CmiycJavaRes.activityState = CmiycJavaRes.SEEKERWAITING;
     	
     }

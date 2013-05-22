@@ -126,7 +126,8 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         };
         filter = new IntentFilter();
         filter.addAction(CmiycJavaRes.ACTION);
-        this.registerReceiver(this.localTextReceiver, filter);
+        filter.setPriority(999);
+        registerReceiver(localTextReceiver, filter);
 
 	}
 
@@ -142,7 +143,8 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 		super.onPause();
 		// when our activity pauses, we want to remove listening for location updates
     	myLocationOverlay.disableMyLocation();
-    	//this.unregisterReceiver(this.localTextReceiver);
+    	//we're not unregistering the receiver; this allows the app to receive pins even when the map is not in the foreground
+    	//unregisterReceiver(localTextReceiver);
 	}
 	
 	@Override
@@ -151,7 +153,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
 		// when our activity resumes, we want to register for location updates
     	myLocationOverlay.enableMyLocation();
         CmiycJavaRes.activityState = CmiycJavaRes.SEEKERMAP;
-        //this.registerReceiver(this.localTextReceiver, filter);
+        //registerReceiver(localTextReceiver, filter);
 
 	}
 
