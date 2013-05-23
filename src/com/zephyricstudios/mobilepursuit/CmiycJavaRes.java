@@ -13,6 +13,8 @@ public class CmiycJavaRes {
 	static final int SNITCHMAP = 354;
 	static final int SEEKERMAP = 254;
 	static final int CONFUSED = 415;
+	static final int LOCAL_PRIORITY = 999;
+	static final int GLOBAL_PRIORITY = 950;
 	
 	static final int SETTINGS_PAGE_RESULT_CODE = 2045;
 	

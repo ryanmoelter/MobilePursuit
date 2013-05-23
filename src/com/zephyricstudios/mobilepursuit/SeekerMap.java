@@ -126,7 +126,7 @@ public class SeekerMap extends MapActivity implements OnClickListener {
         };
         filter = new IntentFilter();
         filter.addAction(CmiycJavaRes.ACTION);
-        filter.setPriority(999);
+        filter.setPriority(CmiycJavaRes.LOCAL_PRIORITY);
         registerReceiver(localTextReceiver, filter);
 
 	}

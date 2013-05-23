@@ -33,41 +33,54 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
         <activity
             android:name="com.zephyricstudios.mobilepursuit.SeekerMainPage"
             android:label="@string/title_activity_seeker_main_page"
             android:screenOrientation="portrait" >
         </activity>
+        
         <activity
             android:name="com.zephyricstudios.mobilepursuit.SnitchMainPage"
             android:label="@string/title_activity_snitch_main_page"
             android:screenOrientation="portrait" >
         </activity>
+        
         <activity
             android:name="com.zephyricstudios.mobilepursuit.Confused"
             android:label="@string/title_activity_confused"
             android:screenOrientation="portrait" >
         </activity>
+        
         <activity
             android:name="com.zephyricstudios.mobilepursuit.SeekerMap"
             android:label="@string/title_activity_seeker_map"
             android:screenOrientation="portrait" >
         </activity>
+        
         <activity
             android:name="com.zephyricstudios.mobilepursuit.SnitchMap"
             android:label="@string/title_activity_snitch_map"
             android:screenOrientation="portrait" >
         </activity>
+        
         <activity
             android:name="com.zephyricstudios.mobilepursuit.SeekerWaitingPage"
             android:label="@string/title_activity_seeker_waiting"
             android:screenOrientation="portrait" >
         </activity>
+        
         <activity
             android:name="com.zephyricstudios.mobilepursuit.GameOverPage"
             android:label="@string/title_activity_game_over_page"
             android:screenOrientation="portrait" >
         </activity>
+        
+        <receiver android:name="com.zephyricstudios.mobilepursuit.GlobalReceiver" >
+            <intent-filter android:priority="950">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
